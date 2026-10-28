@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addProduct } from '@/lib/firestore';
 import { normalizeImageUrl } from '@/lib/utils';
+import { auth } from '@/lib/firebase';
 import AdminProtected from '@/components/AdminProtected';
 import AdminSidebar from '@/components/AdminSidebar';
 import toast from 'react-hot-toast';
@@ -11,6 +12,11 @@ import toast from 'react-hot-toast';
 export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [detailedError, setDetailedError] = useState<{
+    message: string;
+    code: string;
+    authStatus: string;
+  } | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -40,6 +46,7 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setDetailedError(null);
 
     try {
       const images = formData.images
@@ -52,21 +59,39 @@ export default function NewProductPage() {
         return;
       }
 
-      await addProduct({
+      const productData: any = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         category: formData.category,
         images,
-        youtubeVideoUrl: formData.youtubeVideoUrl.trim() || undefined,
         inStock: formData.inStock,
-      });
+      };
+
+      if (formData.youtubeVideoUrl && formData.youtubeVideoUrl.trim() !== '') {
+        productData.youtubeVideoUrl = formData.youtubeVideoUrl.trim();
+      }
+
+      await addProduct(productData);
 
       toast.success('Product added successfully!');
       router.push('/admin/products');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding product:', error);
-      toast.error('Error adding product');
+      const authUser = auth.currentUser;
+      const errorMsg = error?.message || 'Unknown error occurred';
+      const errorCode = error?.code || 'unknown';
+      const authInfo = authUser
+        ? `Logged in as: ${authUser.email || authUser.phoneNumber || authUser.uid}`
+        : 'NOT logged in (Firebase auth.currentUser is null)';
+
+      setDetailedError({
+        message: errorMsg,
+        code: errorCode,
+        authStatus: authInfo,
+      });
+
+      toast.error(`Error (${errorCode}): ${errorMsg}`, { duration: 8000 });
     } finally {
       setLoading(false);
     }
@@ -78,7 +103,25 @@ export default function NewProductPage() {
         <AdminSidebar />
         <div className="flex-1 lg:ml-64">
           <div className="px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold mb-8">Add New Product</h1>
+          <h1 className="text-3xl font-bold mb-6">Add New Product</h1>
+
+          {detailedError && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-lg text-red-900 shadow-sm">
+              <div className="flex items-center font-bold text-red-800 text-lg mb-2">
+                <span className="mr-2 text-xl">⚠️</span> Exact Error Details
+              </div>
+              <div className="space-y-1.5 text-sm">
+                <p><strong className="text-gray-900">Message:</strong> {detailedError.message}</p>
+                <p><strong className="text-gray-900">Error Code:</strong> <code className="bg-red-100 text-red-800 px-2 py-0.5 rounded font-mono font-semibold">{detailedError.code}</code></p>
+                <p><strong className="text-gray-900">Auth Status:</strong> {detailedError.authStatus}</p>
+              </div>
+              {detailedError.code === 'permission-denied' && (
+                <div className="mt-3 p-3 bg-white border border-red-300 rounded text-xs text-red-900">
+                  <strong>💡 Why this occurs:</strong> Firestore rules allow writes only if <code>request.auth != null</code>. If your Auth Status says you are not logged in, please log out and log in again at <a href="/admin/login" className="underline font-bold text-red-700">/admin/login</a>.
+                </div>
+              )}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
             <div>

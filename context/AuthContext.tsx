@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Google Sign-In Error:', error);
       if (error?.code !== 'auth/popup-closed-by-user') {
-        toast.error(error?.message || 'Google sign-in failed');
+        toast.error('Unable to complete Google sign-in. Please try again or use your password.');
       }
       throw error;
     }
@@ -71,11 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return res;
     } catch (error: any) {
       console.error('Email Login Error:', error);
-      let msg = 'Failed to sign in. Please check your credentials.';
-      if (error?.code === 'auth/user-not-found' || error?.code === 'auth/wrong-password' || error?.code === 'auth/invalid-credential') {
-        msg = 'Incorrect email or password.';
-      }
-      toast.error(msg);
+      toast.error('Invalid email or password. Please check your credentials and try again.');
       throw error;
     }
   };
@@ -87,9 +83,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return res;
     } catch (error: any) {
       console.error('Registration Error:', error);
-      let msg = error?.message || 'Failed to create account.';
+      let msg = 'Unable to complete registration. Please try again.';
       if (error?.code === 'auth/email-already-in-use') {
-        msg = 'An account with this email already exists.';
+        msg = 'An account with this email already exists. Please log in.';
       } else if (error?.code === 'auth/weak-password') {
         msg = 'Password should be at least 6 characters.';
       }
@@ -105,11 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return res;
     } catch (error: any) {
       console.error('Phone Login Error:', error);
-      let msg = 'Failed to sign in. Please check your phone number and password.';
-      if (error?.code === 'auth/user-not-found' || error?.code === 'auth/invalid-credential') {
-        msg = 'No account found with this phone number or incorrect password.';
-      }
-      toast.error(msg);
+      toast.error('Invalid phone number or password. Please verify your details and try again.');
       throw error;
     }
   };
@@ -121,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return res;
     } catch (error: any) {
       console.error('Phone Register Error:', error);
-      let msg = error?.message || 'Failed to create phone account.';
+      let msg = 'Unable to complete phone registration. Please try again.';
       if (error?.code === 'auth/email-already-in-use') {
         msg = 'An account with this phone number already exists. Please log in.';
       } else if (error?.code === 'auth/weak-password') {
@@ -135,11 +127,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = async (email: string) => {
     try {
       await authResetPassword(email);
-      toast.success('Password reset email sent! Check your inbox.');
+      toast.success('If an account is associated with this email, password reset instructions have been sent.');
     } catch (error: any) {
       console.error('Reset Password Error:', error);
-      toast.error(error?.message || 'Failed to send password reset email');
-      throw error;
+      // Generic success/neutral message to prevent email enumeration
+      toast.success('If an account is associated with this email, password reset instructions have been sent.');
     }
   };
 

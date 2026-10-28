@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { trackHybridEvent } from '@/lib/fpixel';
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, getTotal } = useCart();
@@ -33,6 +34,17 @@ export default function CartPage() {
 
   const handleWhatsAppCheckout = () => {
     if (cartItems.length === 0) return;
+
+    // Track Contact event via Meta Pixel & CAPI
+    trackHybridEvent({
+      eventName: 'Contact',
+      eventId: `cart_whatsapp_${Date.now()}`,
+      customData: {
+        currency: 'PKR',
+        value: getTotal(),
+        num_items: cartItems.length,
+      },
+    });
 
     let itemsList = cartItems
       .map(

@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import { FiShoppingCart } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import ProductReviews from '@/components/ProductReviews';
+import { trackHybridEvent } from '@/lib/fpixel';
 
 export default function ProductClient() {
   const router = useRouter();
@@ -45,6 +46,18 @@ export default function ProductClient() {
 
         if (productData) {
           setProduct(productData);
+          // Fire Meta ViewContent hybrid event
+          trackHybridEvent({
+            eventName: 'ViewContent',
+            eventId: `view_${productData.id}_${Date.now()}`,
+            customData: {
+              content_name: productData.name,
+              content_ids: [productData.id || ''],
+              content_type: 'product',
+              value: productData.price,
+              currency: 'PKR',
+            },
+          });
         } else {
           toast.error('Product not found');
           router.push('/products');
@@ -75,6 +88,27 @@ export default function ProductClient() {
         quantity,
         image: normalizeImageUrl(product.images[0]) || '',
       });
+
+      // Fire Meta AddToCart hybrid event
+      trackHybridEvent({
+        eventName: 'AddToCart',
+        eventId: `cart_${product.id}_${Date.now()}`,
+        customData: {
+          content_name: product.name,
+          content_ids: [product.id || ''],
+          content_type: 'product',
+          value: product.price * quantity,
+          currency: 'PKR',
+          contents: [
+            {
+              id: product.id || '',
+              quantity,
+              item_price: product.price,
+            },
+          ],
+        },
+      });
+
       toast.success('Added to cart!');
     }
   };
@@ -86,6 +120,19 @@ export default function ProductClient() {
 
   const handleWhatsAppOrder = () => {
     if (!product) return;
+
+    // Track Contact event via Meta Pixel & CAPI
+    trackHybridEvent({
+      eventName: 'Contact',
+      eventId: `whatsapp_${product.id}_${Date.now()}`,
+      customData: {
+        content_name: product.name,
+        content_ids: [product.id || ''],
+        value: product.price * quantity,
+        currency: 'PKR',
+      },
+    });
+
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
     const message = `Hi FZhandcrafts! 🌸\nI would like to order:\n\n*Product:* ${product.name}\n*Price:* ${formatCurrency(product.price)}\n*Quantity:* ${quantity}\n*Total:* ${formatCurrency(product.price * quantity)}\n\n*Product Link:* ${currentUrl}`;
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;

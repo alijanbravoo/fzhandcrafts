@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
       router.push('/admin');
     } catch (error: any) {
       console.error('Login error:', error);
-      toast.error(error.message || 'Invalid email or password');
+      toast.error('Invalid administrative credentials. Please verify and try again.');
     } finally {
       setLoading(false);
     }

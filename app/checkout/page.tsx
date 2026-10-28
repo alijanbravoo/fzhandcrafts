@@ -16,7 +16,25 @@ import {
 import { createOrder, getNextOrderNumber, OrderItem } from '@/lib/firestore';
 import toast from 'react-hot-toast';
 import { FcGoogle } from 'react-icons/fc';
-import { FiCheckCircle, FiLock, FiPhone, FiUser, FiMapPin, FiMail } from 'react-icons/fi';
+import { FiCheckCircle, FiLock, FiPhone, FiUser, FiMapPin, FiMail, FiPhoneCall, FiArrowRight } from 'react-icons/fi';
+import confetti from 'canvas-confetti';
+import { trackHybridEvent } from '@/lib/fpixel';
+
+export type GenericOrderErrorType =
+  | 'SERVICE_PERMISSION_DENIED'
+  | 'NETWORK_CONNECTIVITY_ISSUE'
+  | 'DATA_SCHEMA_MISMATCH'
+  | 'SERVICE_UNAVAILABLE'
+  | 'TRANSACTION_ABORTED'
+  | 'GENERIC_PROCESSING_FAILURE';
+
+export interface OrderDebugReport {
+  genericType: GenericOrderErrorType;
+  errorCode: string;
+  sanitizedMessage: string;
+  authMode: 'AUTHENTICATED_USER' | 'GUEST_USER';
+  timestamp: string;
+}
 
 export default function CheckoutPage() {
   const { cartItems, getTotal, clearCart } = useCart();
@@ -25,6 +43,7 @@ export default function CheckoutPage() {
 
   const [loading, setLoading] = useState(false);
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [orderDebugReport, setOrderDebugReport] = useState<OrderDebugReport | null>(null);
 
   const [formData, setFormData] = useState({
     customerName: '',
@@ -43,8 +62,47 @@ export default function CheckoutPage() {
     name: string;
   } | null>(null);
 
+  // Transition overlay state shown immediately when an order is placed
+  const [orderTransition, setOrderTransition] = useState<{
+    orderNumber: string;
+    phone: string;
+    customerName: string;
+    isGuest: boolean;
+  } | null>(null);
+
   const [accountPassword, setAccountPassword] = useState('');
   const [savingAccount, setSavingAccount] = useState(false);
+
+  const triggerConfetti = () => {
+    try {
+      // First burst
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#e11d48', '#f43f5e', '#fb7185', '#10b981', '#3b82f6', '#f59e0b'],
+      });
+      // Second burst slightly delayed for realistic celebration feel
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#e11d48', '#10b981', '#fbbf24'],
+        });
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#e11d48', '#10b981', '#38bdf8'],
+        });
+      }, 250);
+    } catch (e) {
+      console.warn('Confetti animation failed:', e);
+    }
+  };
 
   // Prepopulate form if user is logged in
   useEffect(() => {
@@ -64,6 +122,30 @@ export default function CheckoutPage() {
           customerPhone: prev.customerPhone || savedOrders[savedOrders.length - 1].customerPhone,
         }));
       }
+    }
+
+    // Fire Meta InitiateCheckout hybrid event
+    if (cartItems.length > 0) {
+      const checkoutEventId = `initiate_checkout_${Date.now()}`;
+      trackHybridEvent({
+        eventName: 'InitiateCheckout',
+        eventId: checkoutEventId,
+        userData: {
+          email: user?.email || undefined,
+          phone: isPhoneUser ? phoneNumber : undefined,
+          firstName: displayName || undefined,
+        },
+        customData: {
+          currency: 'PKR',
+          value: getTotal(),
+          num_items: cartItems.length,
+          contents: cartItems.map((item) => ({
+            id: item.productId,
+            quantity: item.quantity,
+            item_price: item.price,
+          })),
+        },
+      });
     }
   }, [user, displayName, isPhoneUser, phoneNumber]);
 
@@ -108,6 +190,7 @@ export default function CheckoutPage() {
 
     setLoading(true);
     setPhoneError(null);
+    setOrderDebugReport(null);
 
     try {
       const orderItems: OrderItem[] = cartItems.map((item) => ({
@@ -115,7 +198,7 @@ export default function CheckoutPage() {
         productName: item.name,
         quantity: item.quantity,
         price: item.price,
-        image: item.image,
+        image: item.image || '',
       }));
 
       let orderNumber = '';
@@ -130,7 +213,7 @@ export default function CheckoutPage() {
       // If customer didn't provide email, use phone number as account identifier
       const effectiveEmail = formData.customerEmail.trim() || phoneToEmail(cleanedPhone);
 
-      const orderId = await createOrder({
+      const orderPayload: any = {
         orderNumber,
         customerName: formData.customerName.trim(),
         customerEmail: effectiveEmail,
@@ -139,11 +222,20 @@ export default function CheckoutPage() {
         items: orderItems,
         total: getTotal(),
         status: 'processing',
-        specialRequest: formData.specialRequest.trim() || undefined,
-        preferredCallTime: formData.preferredCallTime || undefined,
         confirmationCallStatus: 'pending',
-        userId: user?.uid || undefined,
-      });
+      };
+
+      if (formData.specialRequest && formData.specialRequest.trim() !== '') {
+        orderPayload.specialRequest = formData.specialRequest.trim();
+      }
+      if (formData.preferredCallTime && formData.preferredCallTime.trim() !== '') {
+        orderPayload.preferredCallTime = formData.preferredCallTime.trim();
+      }
+      if (user?.uid) {
+        orderPayload.userId = user.uid;
+      }
+
+      const orderId = await createOrder(orderPayload);
 
       // Save order to browser localStorage for easy reference
       if (typeof window !== 'undefined') {
@@ -157,9 +249,44 @@ export default function CheckoutPage() {
         localStorage.setItem('fz_orders', JSON.stringify(savedOrders));
       }
 
+      // Fire Meta Purchase hybrid event (Browser Pixel + Server CAPI)
+      const purchaseEventId = `order_${orderNumber}`;
+      trackHybridEvent({
+        eventName: 'Purchase',
+        eventId: purchaseEventId,
+        userData: {
+          email: effectiveEmail,
+          phone: cleanedPhone,
+          firstName: formData.customerName.trim(),
+          city: formData.customerAddress.trim(),
+        },
+        customData: {
+          currency: 'PKR',
+          value: getTotal(),
+          order_id: orderNumber,
+          num_items: orderItems.length,
+          contents: orderItems.map((item) => ({
+            id: item.productId,
+            quantity: item.quantity,
+            item_price: item.price,
+          })),
+        },
+      });
+
       clearCart();
 
-      // If user was NOT logged in, prompt them to save/create account with Google or Password!
+      // Trigger confetti celebration
+      triggerConfetti();
+
+      // Prepare transition overlay
+      setOrderTransition({
+        orderNumber,
+        phone: cleanedPhone,
+        customerName: formData.customerName.trim(),
+        isGuest: !user,
+      });
+
+      // Also set completedOrder for guest post-order registration
       if (!user) {
         setCompletedOrder({
           orderNumber,
@@ -167,14 +294,38 @@ export default function CheckoutPage() {
           phone: cleanedPhone,
           name: formData.customerName.trim(),
         });
-        toast.success(`Order #${orderNumber} placed successfully!`);
-      } else {
-        toast.success(`Order #${orderNumber} placed successfully!`);
-        router.push(`/order-status?orderNumber=${orderNumber}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating order:', error);
-      toast.error('Failed to place order. Please try again.');
+
+      const rawCode = String(error?.code || 'unknown').toLowerCase();
+      const rawMsg = String(error?.message || '');
+
+      let genericType: GenericOrderErrorType = 'GENERIC_PROCESSING_FAILURE';
+      if (rawCode.includes('permission') || rawCode === 'permission-denied') {
+        genericType = 'SERVICE_PERMISSION_DENIED';
+      } else if (rawCode.includes('network') || rawCode.includes('unavailable') || rawCode.includes('deadline')) {
+        genericType = 'NETWORK_CONNECTIVITY_ISSUE';
+      } else if (rawCode.includes('invalid') || rawCode.includes('argument') || rawMsg.includes('undefined')) {
+        genericType = 'DATA_SCHEMA_MISMATCH';
+      } else if (rawCode.includes('aborted')) {
+        genericType = 'TRANSACTION_ABORTED';
+      }
+
+      // Sanitize message so internal endpoints or keys are never exposed
+      const sanitized = rawMsg
+        .replace(/https?:\/\/[^\s]+/g, '[REDACTED_URI]')
+        .slice(0, 180) || 'Database service was unable to persist document.';
+
+      setOrderDebugReport({
+        genericType,
+        errorCode: error?.code || 'NO_CODE',
+        sanitizedMessage: sanitized,
+        authMode: user ? 'AUTHENTICATED_USER' : 'GUEST_USER',
+        timestamp: new Date().toLocaleTimeString(),
+      });
+
+      toast.error('Failed to place order. Diagnostic details are shown below.');
     } finally {
       setLoading(false);
     }
@@ -215,6 +366,74 @@ export default function CheckoutPage() {
       setSavingAccount(false);
     }
   };
+
+  // Transition screen shown immediately when order is placed
+  if (orderTransition) {
+    const handleTransitionDone = () => {
+      if (orderTransition.isGuest) {
+        setOrderTransition(null); // Reveals the guest account creation screen
+      } else {
+        router.push(`/order-status?orderNumber=${orderTransition.orderNumber}`);
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-10 text-center animate-modal-pop relative overflow-hidden border border-emerald-100">
+          {/* Decorative ambient background accents */}
+          <div className="absolute -top-16 -right-16 w-36 h-36 bg-emerald-100/60 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-primary-100/50 rounded-full blur-2xl pointer-events-none" />
+
+          {/* Animated celebration icon */}
+          <div className="relative mx-auto mb-6 w-20 h-20 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-emerald-100 animate-pulse-ring" />
+            <div className="relative w-20 h-20 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
+              <FiCheckCircle className="w-10 h-10" />
+            </div>
+          </div>
+
+          {/* Primary celebration headline */}
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
+            Order Placed, Thank you! 🎉
+          </h1>
+          <p className="text-xs sm:text-sm font-semibold text-emerald-600 uppercase tracking-wider mb-5">
+            Order #{orderTransition.orderNumber} Confirmed
+          </p>
+
+          {/* Phone call notice banner */}
+          <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 rounded-2xl p-4 sm:p-5 mb-6 text-left shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                <FiPhoneCall className="w-5 h-5 animate-bounce" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wide">Important Notice</p>
+                <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                  Kindly keep your phone number active, we&apos;ll call you to confirm the order.
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  Registered number:{' '}
+                  <span className="font-bold text-gray-900">
+                    {formatPakistaniPhone(orderTransition.phone)}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button
+            type="button"
+            onClick={handleTransitionDone}
+            className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white py-3.5 px-6 rounded-xl font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+          >
+            <span>{orderTransition.isGuest ? 'Continue to Order Details' : 'View Order Details'}</span>
+            <FiArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Modal / Screen shown after guest checkout
   if (completedOrder) {
@@ -529,6 +748,44 @@ export default function CheckoutPage() {
             >
               {loading ? 'Placing Your Order...' : `Place Order • ${formatCurrency(getTotal())}`}
             </button>
+
+            {orderDebugReport && (
+              <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-300 rounded-xl text-amber-950 shadow-sm animate-fadeIn">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-900 text-sm">
+                    <span>🛠️ Order Diagnostic (Debug Mode)</span>
+                  </div>
+                  <span className="text-[10px] font-mono bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-semibold">
+                    {orderDebugReport.timestamp}
+                  </span>
+                </div>
+                <div className="text-xs space-y-1.5 text-gray-800">
+                  <p>
+                    <span className="font-semibold text-gray-700">Generic Type:</span>{' '}
+                    <code className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-mono font-bold">
+                      {orderDebugReport.genericType}
+                    </code>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-700">Code:</span>{' '}
+                    <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded font-mono">
+                      {orderDebugReport.errorCode}
+                    </code>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-700">Auth Mode:</span>{' '}
+                    <span className="font-medium text-gray-900">{orderDebugReport.authMode}</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-700">Summary:</span>{' '}
+                    <span className="text-gray-900 font-mono text-[11px] break-all">{orderDebugReport.sanitizedMessage}</span>
+                  </p>
+                </div>
+                <p className="mt-2 text-[10px] text-amber-700 italic">
+                  * Temporary debugging panel active. No sensitive secrets or credentials are exposed.
+                </p>
+              </div>
+            )}
           </form>
         </div>
 

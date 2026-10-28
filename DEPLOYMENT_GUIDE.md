@@ -6,7 +6,7 @@ This guide explains how to update and deploy your live **FZhandcrafts** website 
 
 ## 📌 How Your Website Works with Firebase
 1. When you run `npm run build`, Next.js compiles all pages, components, and assets into static HTML/CSS/JS files inside the **`out`** folder.
-2. Firebase Hosting takes everything inside the **`out`** folder and publishes it directly to the internet on your live domain (`fzhandcrafts-17f77.web.app` / your custom domain).
+2. Firebase Hosting takes everything inside the **`out`** folder and publishes it directly to the internet on your live domain (`fzhandcrafts.web.app` / your custom domain `fz-flower.shop`).
 
 ---
 
@@ -15,7 +15,7 @@ This guide explains how to update and deploy your live **FZhandcrafts** website 
 Because we added Google / Gmail Sign-In, you must enable it in your Firebase project:
 
 1. Open your browser and go to the [Firebase Console](https://console.firebase.google.com/).
-2. Select your project: **`fzhandcrafts-17f77`**.
+2. Select your project: **`fzhandcrafts`**.
 3. In the left navigation menu, click **Build** > **Authentication**.
 4. Click on the **Sign-in method** tab.
 5. In the providers list, click **Google**.
@@ -23,7 +23,15 @@ Because we added Google / Gmail Sign-In, you must enable it in your Firebase pro
 7. Choose your support email from the dropdown.
 8. Click **Save**.
 
-*(Make sure **Email/Password** is also enabled on the same page).*
+### 🌐 Add Your Custom Domain to Authorized Domains:
+Since you attached your custom domain `fz-flower.shop`:
+1. In Firebase Console, go to **Authentication** > **Settings** tab.
+2. Click on **Authorized domains**.
+3. Click **Add domain**.
+4. Enter: `fz-flower.shop` and click **Done**.
+5. *(Optional)* Click **Add domain** again and add `www.fz-flower.shop`.
+
+*(Make sure **Email/Password** is also enabled under the Sign-in method tab).*
 
 ---
 
@@ -110,27 +118,38 @@ Once finished, you will see:
 ```text
 ✔  Deploy complete!
 
-Hosting URL: https://fzhandcrafts-17f77.web.app
+Hosting URL: https://fzhandcrafts.web.app (or https://fz-flower.shop)
 ```
 
 ---
 
-## 🔍 Step 4: Verify the New Features on Your Live Site
+## 🔍 Step 4: Verify Features on Your Live Site
 
 Open your website in Chrome/Edge (or on your phone):
-1. **Floating WhatsApp Chat**: Look at the bottom-right corner. Click the floating green WhatsApp icon to test opening chat.
-2. **Order via WhatsApp**: Open any product page and test the green **"Order via WhatsApp"** button.
-3. **Phone Number Check**: Go to Checkout and test entering a number that is not 11 digits or does not start with `03`. Notice the validation.
-4. **Google Sign-In**: Click **Sign In** in the top navigation bar and test **"Continue with Google (Gmail)"**.
-5. **Customer Reviews**: Open any product page, scroll down to the new **"Customer Reviews & Ratings"** section, and post a test review.
-6. **Admin WhatsApp Setting**: Log in to `/admin/login`, go to **Settings**, and customize your Business WhatsApp Number anytime!
+1. **Order Tracking**: In the footer, click **Order Tracking** (renamed from Order Status). Customers can only see their own orders. Other users cannot scrape or view details of orders that do not belong to them.
+2. **Security & Privacy on Sign In**: Sign in with incorrect credentials to verify generic security responses (preventing user enumeration).
+3. **Floating WhatsApp Chat**: Click the floating green WhatsApp icon at bottom right.
+4. **Order via WhatsApp**: Open any product page and test the green **"Order via WhatsApp"** button.
+5. **Google Sign-In**: Click **Sign In** and verify **"Continue with Google (Gmail)"**.
+6. **Customer Reviews**: Test adding product reviews.
+
+---
+
+## 🔒 Customer Privacy & Order Security Architecture
+
+1. **Account Order Isolation**:
+   - Logged-in customers can only access orders where `userId`, `email`, or `phone` strictly matches their own authenticated credentials.
+   - If an unauthorized user attempts to view another customer's order, an **Access Restricted** privacy screen is displayed and no shipping or item details are revealed.
+2. **Guest Order Protection**:
+   - Orders placed without an account are accessible to the originating browser via local token, or require **Phone Number Verification** before any shipping address is shown.
+3. **Generic Authentication Errors**:
+   - Login endpoints use standardized error messages (`Invalid email or password`, `Invalid phone number or password`) to ensure account enumeration is blocked.
 
 ---
 
 ## 💡 Quick Cheat-Sheet for Future Updates:
-Whenever you change anything in the future, just run these two commands:
-```bash
-npm run build
-npx firebase deploy --only hosting
+Whenever you change anything in the future, just run this command:
+```powershell
+npm run build; npx.cmd firebase deploy --only hosting
 ```
 That's it!

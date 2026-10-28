@@ -90,15 +90,20 @@ export default function EditProductClient() {
         return;
       }
 
-      await updateProduct(productId, {
+      const productData: any = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         category: formData.category,
         images,
-        youtubeVideoUrl: formData.youtubeVideoUrl.trim() || undefined,
         inStock: formData.inStock,
-      });
+      };
+
+      if (formData.youtubeVideoUrl && formData.youtubeVideoUrl.trim() !== '') {
+        productData.youtubeVideoUrl = formData.youtubeVideoUrl.trim();
+      }
+
+      await updateProduct(productId, productData);
 
       toast.success('Product updated successfully!');
       router.push('/admin/products');

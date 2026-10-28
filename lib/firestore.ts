@@ -106,16 +106,33 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
 
 export const addProduct = async (product: Omit<Product, 'id' | 'createdAt'>): Promise<string> => {
   const productsRef = collection(db, 'products');
-  const docRef = await addDoc(productsRef, {
-    ...product,
+  const cleanData: Record<string, any> = {
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    category: product.category,
+    images: product.images,
+    inStock: product.inStock,
     createdAt: Timestamp.now(),
-  });
+  };
+
+  if (product.youtubeVideoUrl && product.youtubeVideoUrl.trim() !== '') {
+    cleanData.youtubeVideoUrl = product.youtubeVideoUrl.trim();
+  }
+
+  const docRef = await addDoc(productsRef, cleanData);
   return docRef.id;
 };
 
 export const updateProduct = async (id: string, product: Partial<Product>): Promise<void> => {
   const docRef = doc(db, 'products', id);
-  await updateDoc(docRef, product);
+  const cleanData: Record<string, any> = {};
+  for (const [key, value] of Object.entries(product)) {
+    if (value !== undefined) {
+      cleanData[key] = value;
+    }
+  }
+  await updateDoc(docRef, cleanData);
 };
 
 export const deleteProduct = async (id: string): Promise<void> => {
@@ -125,21 +142,51 @@ export const deleteProduct = async (id: string): Promise<void> => {
 
 // Orders
 export const createOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  if (!order.customerName || !order.items.length) {
+    const err: any = new Error('Invalid order data: Missing customerName or items.');
+    err.code = 'invalid-order-data';
+    throw err;
+  }
+
+  const now = Timestamp.now();
+  const docRef = doc(db, 'orders', order.orderNumber);
+
+  // Clean document to strictly omit any undefined fields which Firestore rejects
+  const cleanOrder: Record<string, any> = {
+    orderNumber: order.orderNumber,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail || '',
+    customerPhone: order.customerPhone,
+    customerAddress: order.customerAddress,
+    items: order.items,
+    total: order.total,
+    status: order.status || 'processing',
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  if (order.specialRequest && order.specialRequest.trim() !== '') {
+    cleanOrder.specialRequest = order.specialRequest.trim();
+  }
+  if (order.preferredCallTime && order.preferredCallTime.trim() !== '') {
+    cleanOrder.preferredCallTime = order.preferredCallTime.trim();
+  }
+  if (order.confirmationCallStatus) {
+    cleanOrder.confirmationCallStatus = order.confirmationCallStatus;
+  }
+  if (order.userId) {
+    cleanOrder.userId = order.userId;
+  }
+  if (order.cancellationReason) {
+    cleanOrder.cancellationReason = order.cancellationReason;
+  }
+
   try {
-    if (!order.customerName || !order.items.length) {
-      throw new Error('Invalid order data. Please fill in all required fields.');
-    }
-    const now = Timestamp.now();
-    const docRef = doc(db, 'orders', order.orderNumber);
-    await setDoc(docRef, {
-      ...order,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await setDoc(docRef, cleanOrder);
     return docRef.id;
   } catch (error) {
-    console.error('Error creating order:', error);
-    throw new Error('Failed to create order. Please check your connection and try again.');
+    console.error('Error creating order in Firestore:', error);
+    throw error;
   }
 };
 
@@ -297,7 +344,7 @@ export const addReview = async (review: Omit<Review, 'id' | 'createdAt'>): Promi
   }
 };
 
-// Customer Orders Lookup
+// Customer Orders Lookup (Scoped strictly to the authenticated user's own orders)
 export const getCustomerOrders = async (params: {
   userId?: string;
   email?: string;
@@ -305,19 +352,40 @@ export const getCustomerOrders = async (params: {
 }): Promise<Order[]> => {
   try {
     const ordersRef = collection(db, 'orders');
-    const snapshot = await getDocs(query(ordersRef, orderBy('createdAt', 'desc')));
-    const all = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
-    
-    const targetUserId = params.userId;
-    const targetEmail = params.email ? params.email.toLowerCase().trim() : '';
-    const targetPhone = params.phone ? cleanPhoneNumber(params.phone) : '';
+    const ordersMap = new Map<string, Order>();
 
-    return all.filter(order => {
-      if (targetUserId && order.userId === targetUserId) return true;
-      if (targetEmail && order.customerEmail && order.customerEmail.toLowerCase().trim() === targetEmail) return true;
-      if (targetPhone && order.customerPhone && cleanPhoneNumber(order.customerPhone) === targetPhone) return true;
-      return false;
+    if (params.userId) {
+      const qUser = query(ordersRef, where('userId', '==', params.userId));
+      const snap = await getDocs(qUser);
+      snap.docs.forEach(doc => ordersMap.set(doc.id, { id: doc.id, ...doc.data() } as Order));
+    }
+
+    if (params.phone) {
+      const cleanPhone = cleanPhoneNumber(params.phone);
+      if (cleanPhone) {
+        const qPhone = query(ordersRef, where('customerPhone', '==', cleanPhone));
+        const snap = await getDocs(qPhone);
+        snap.docs.forEach(doc => ordersMap.set(doc.id, { id: doc.id, ...doc.data() } as Order));
+      }
+    }
+
+    if (params.email) {
+      const cleanEmail = params.email.toLowerCase().trim();
+      if (cleanEmail) {
+        const qEmail = query(ordersRef, where('customerEmail', '==', cleanEmail));
+        const snap = await getDocs(qEmail);
+        snap.docs.forEach(doc => ordersMap.set(doc.id, { id: doc.id, ...doc.data() } as Order));
+      }
+    }
+
+    const orders = Array.from(ordersMap.values());
+    orders.sort((a, b) => {
+      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      return timeB - timeA;
     });
+
+    return orders;
   } catch (error) {
     console.error('Error fetching customer orders:', error);
     return [];
