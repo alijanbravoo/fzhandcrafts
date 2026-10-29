@@ -515,14 +515,18 @@ export default function CheckoutPage() {
   }
 
   if (cartItems.length === 0) {
+  if (cartItems.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Checkout</h1>
-          <p className="text-gray-600 mb-8">Your cart is empty.</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center bg-white border border-[#eae8e5] p-10 sm:p-14 rounded-3xl max-w-lg mx-auto shadow-xs">
+          <span className="text-4xl mb-3 block">🛍️</span>
+          <h1 className="font-serif text-3xl font-bold text-[#013428] mb-3">Your Bag is Empty</h1>
+          <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+            Explore our handcrafted artificial velvet gajray and festive floral jewelry collection.
+          </p>
           <button
             onClick={() => router.push('/products')}
-            className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+            className="inline-block bg-[#013428] text-white hover:bg-[#1e4b3e] px-8 py-3.5 rounded-full font-semibold text-sm shadow-[0_8px_20px_rgba(1,52,40,0.25)] transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             Continue Shopping
           </button>
@@ -534,32 +538,40 @@ export default function CheckoutPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Checkout</h1>
-        <p className="text-sm text-gray-500 mt-1">Cash on Delivery (COD) available across Pakistan</p>
+        <span className="text-xs uppercase tracking-widest text-[#6b1d30] font-bold">
+          Secure Checkout
+        </span>
+        <h1 className="font-serif text-3xl sm:text-4xl text-[#013428] font-medium tracking-tight mt-1">
+          Complete Your Order
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#34a853] animate-pulse"></span>
+          <span>Cash on Delivery (COD) &amp; Express 2-3 Days Nationwide Courier across Pakistan</span>
+        </p>
       </div>
 
       {/* Guest Login Banner */}
       {!user && (
-        <div className="mb-8 p-4 bg-primary-50 border border-primary-100 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mb-8 p-4 bg-white border border-[#eae8e5] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0">
-              <FiUser className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-full bg-[#6b1d30]/10 text-[#6b1d30] flex items-center justify-center flex-shrink-0 text-lg">
+              <FiUser />
             </div>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">Have a Gmail or Phone Account?</p>
-              <p className="text-xs text-gray-600">Sign in for fast autofill and automatic order tracking.</p>
+              <p className="font-serif font-bold text-gray-900 text-sm">Have a Google or Phone Account?</p>
+              <p className="text-xs text-gray-500">Sign in for quick autofill and instant live order status tracking.</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => signInWithGoogle()}
-              className="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-800 text-xs font-semibold rounded-lg border border-gray-300 shadow-sm flex items-center gap-2"
+              className="px-3.5 py-2 bg-white hover:bg-gray-50 text-gray-800 text-xs font-semibold rounded-full border border-gray-300 shadow-xs flex items-center gap-2"
             >
               <FcGoogle className="w-4 h-4" /> Sign In with Google
             </button>
             <Link
               href="/login"
-              className="px-3.5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-lg shadow-sm"
+              className="px-4 py-2 bg-[#013428] hover:bg-[#1e4b3e] text-white text-xs font-semibold rounded-full shadow-xs"
             >
               Login
             </Link>
@@ -568,80 +580,76 @@ export default function CheckoutPage() {
       )}
 
       {user && (
-        <div className="mb-8 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+        <div className="mb-8 p-4 bg-[#e6f4ea] border border-[#a8dab5] rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">
+            <div className="w-9 h-9 rounded-full bg-[#013428] text-white flex items-center justify-center font-bold text-sm">
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900">
-                Ordering as <span className="text-emerald-700">{displayName}</span>
+                Ordering as <span className="text-[#013428] font-bold">{displayName}</span>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-600">
                 {user.email && !isPhoneUser ? user.email : formatPakistaniPhone(phoneNumber)}
               </p>
             </div>
           </div>
-          <span className="text-xs text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full font-medium">
+          <span className="text-xs text-[#1e6b47] bg-white/80 border border-[#a8dab5] px-2.5 py-1 rounded-full font-semibold">
             Logged In
           </span>
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-6 sm:gap-8 md:gap-12">
+      <div className="grid md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-start">
         {/* Shipping Form */}
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 flex items-center gap-2">
-            <FiMapPin className="text-primary-600" /> Shipping Information
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#eae8e5] shadow-xs">
+          <h2 className="font-serif text-2xl font-bold mb-4 sm:mb-6 text-[#013428] flex items-center gap-2">
+            <span className="text-[#6b1d30]">📍</span> Shipping Information
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="customerName" className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor="customerName" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
                 Full Name *
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="customerName"
-                  required
-                  placeholder="e.g. Muhammad Ali"
-                  value={formData.customerName}
-                  onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900"
-                />
-              </div>
+              <input
+                type="text"
+                id="customerName"
+                required
+                placeholder="e.g. Ayesha Khan"
+                value={formData.customerName}
+                onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
+              />
             </div>
 
             <div>
-              <label htmlFor="customerPhone" className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor="customerPhone" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
                 Phone Number (11 digits, starts with 03) *
               </label>
-              <div className="relative">
-                <input
-                  type="tel"
-                  id="customerPhone"
-                  required
-                  placeholder="03001234567"
-                  maxLength={14}
-                  value={formData.customerPhone}
-                  onChange={(e) => handlePhoneChange(e.target.value)}
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:border-transparent bg-white text-gray-900 ${
-                    phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'
-                  }`}
-                />
-              </div>
+              <input
+                type="tel"
+                id="customerPhone"
+                required
+                placeholder="03001234567"
+                maxLength={14}
+                value={formData.customerPhone}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm ${
+                  phoneError ? 'border-red-500 focus:ring-red-500' : 'border-[#eae8e5] focus:ring-[#013428]'
+                }`}
+              />
               {phoneError ? (
                 <p className="text-xs text-red-600 font-medium mt-1">{phoneError}</p>
               ) : (
-                <p className="text-xs text-gray-500 mt-1">
-                  Check: Must be 11 digits starting with 03 (e.g. 03001234567). Spaces & dashes are cleaned automatically.
+                <p className="text-[11px] text-gray-500 mt-1">
+                  11 digits starting with 03 (e.g. 03001234567). We call this number for confirmation.
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="customerEmail" className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor="customerEmail" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
                 Email Address (Optional)
               </label>
               <input
@@ -650,15 +658,15 @@ export default function CheckoutPage() {
                 placeholder="your.email@example.com"
                 value={formData.customerEmail}
                 onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900"
+                className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-[11px] text-gray-500 mt-1">
                 If omitted, your phone number will be used to track your orders.
               </p>
             </div>
 
             <div>
-              <label htmlFor="customerAddress" className="block text-sm font-semibold text-gray-700 mb-1">
+              <label htmlFor="customerAddress" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
                 Complete Delivery Address *
               </label>
               <textarea
@@ -668,46 +676,46 @@ export default function CheckoutPage() {
                 placeholder="House/Apartment #, Street, Sector/Area, City"
                 value={formData.customerAddress}
                 onChange={(e) => setFormData({ ...formData, customerAddress: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900"
+                className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
               />
             </div>
 
             {/* Special Request */}
             <div>
-              <label htmlFor="specialRequest" className="block text-sm font-semibold text-gray-700 mb-1">
-                Special Request (Optional)
+              <label htmlFor="specialRequest" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
+                Special Request or Custom Notes (Optional)
               </label>
               <textarea
                 id="specialRequest"
-                rows={3}
-                placeholder="Add any customization details, gift card greeting, or delivery instructions..."
+                rows={2}
+                placeholder="Add any customization details, gift greeting, or special event date..."
                 value={formData.specialRequest}
                 onChange={(e) => setFormData({ ...formData, specialRequest: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-900 text-sm"
+                className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
               />
             </div>
 
             {/* Preferred Call Time */}
-            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-              <label className="block text-sm font-semibold text-gray-800 mb-2">
-                Preferred time to talk on Call (Optional)
+            <div className="bg-[#f5f3f0] p-4 sm:p-5 rounded-2xl border border-[#eae8e5]">
+              <label className="block text-xs uppercase tracking-wider font-bold text-[#013428] mb-1">
+                Preferred Confirmation Call Window (Optional)
               </label>
               <p className="text-xs text-gray-500 mb-3">
-                Select your preferred window for our team to call for order confirmation:
+                Select your preferred window for our atelier team to call for order confirmation:
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {[
-                  { value: 'Morning 8-12 AM', label: '🌅 Morning (8:00 AM - 12:00 PM)' },
-                  { value: 'Noon 12-3 PM', label: '☀️ Noon (12:00 PM - 3:00 PM)' },
-                  { value: 'Afternoon 3-6 PM', label: '🌤️ Afternoon (3:00 PM - 6:00 PM)' },
-                  { value: 'Night 6-10 PM', label: '🌙 Night (6:00 PM - 10:00 PM)' },
+                  { value: 'Morning 8-12 AM', label: '🌅 Morning (8 AM - 12 PM)' },
+                  { value: 'Noon 12-3 PM', label: '☀️ Noon (12 PM - 3 PM)' },
+                  { value: 'Afternoon 3-6 PM', label: '🌤️ Afternoon (3 PM - 6 PM)' },
+                  { value: 'Night 6-10 PM', label: '🌙 Night (6 PM - 10 PM)' },
                 ].map((option) => (
                   <label
                     key={option.value}
-                    className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer text-xs font-semibold transition-all ${
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer text-xs font-semibold transition-all ${
                       formData.preferredCallTime === option.value
-                        ? 'border-primary-600 bg-primary-50 text-primary-800 ring-1 ring-primary-600'
-                        : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100'
+                        ? 'border-[#013428] bg-white text-[#013428] ring-2 ring-[#013428]'
+                        : 'border-[#eae8e5] bg-white/70 text-gray-700 hover:bg-white'
                     }`}
                   >
                     <input
@@ -716,7 +724,7 @@ export default function CheckoutPage() {
                       value={option.value}
                       checked={formData.preferredCallTime === option.value}
                       onChange={(e) => setFormData({ ...formData, preferredCallTime: e.target.value })}
-                      className="text-primary-600 focus:ring-primary-500 w-4 h-4"
+                      className="text-[#013428] focus:ring-[#013428] w-4 h-4"
                     />
                     <span>{option.label}</span>
                   </label>
@@ -726,27 +734,32 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, preferredCallTime: '' })}
-                  className="text-[11px] text-gray-400 hover:text-gray-600 underline mt-2 block"
+                  className="text-[11px] text-[#6b1d30] hover:underline mt-2 block font-medium"
                 >
                   Clear call time preference
                 </button>
               )}
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <p className="text-xs font-semibold text-gray-700 mb-1">Payment Method</p>
-              <div className="flex items-center gap-2 text-sm text-gray-800 font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-                <span>Cash on Delivery (Pay when you receive your order)</span>
+            <div className="p-4 bg-[#f5f3f0] rounded-2xl border border-[#eae8e5] flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wider font-bold text-gray-800">Payment Method</p>
+                <div className="flex items-center gap-2 text-xs text-gray-700 font-medium mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-[#34a853] inline-block animate-pulse"></span>
+                  <span>Cash on Delivery (Pay when delivered)</span>
+                </div>
               </div>
+              <span className="text-xs font-bold text-[#013428] bg-white px-3 py-1 rounded-full border border-[#eae8e5]">
+                COD
+              </span>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-600 text-white py-3.5 px-6 rounded-lg font-bold text-base hover:bg-primary-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-14 min-h-[56px] bg-[#013428] hover:bg-[#1e4b3e] text-white py-3.5 px-6 rounded-full font-bold text-base shadow-[0_8px_20px_rgba(1,52,40,0.25)] transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {loading ? 'Placing Your Order...' : `Place Order • ${formatCurrency(getTotal())}`}
+              <span>{loading ? 'Confirming Your Order...' : `Place Order — ${formatCurrency(getTotal())}`}</span>
             </button>
 
             {orderDebugReport && (
@@ -781,9 +794,6 @@ export default function CheckoutPage() {
                     <span className="text-gray-900 font-mono text-[11px] break-all">{orderDebugReport.sanitizedMessage}</span>
                   </p>
                 </div>
-                <p className="mt-2 text-[10px] text-amber-700 italic">
-                  * Temporary debugging panel active. No sensitive secrets or credentials are exposed.
-                </p>
               </div>
             )}
           </form>
@@ -791,22 +801,28 @@ export default function CheckoutPage() {
 
         {/* Order Summary */}
         <div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-20 md:top-24">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900">Order Summary</h2>
-            <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-1">
+          <div className="bg-white rounded-3xl shadow-xs border border-[#eae8e5] p-6 sm:p-8 sticky top-20 md:top-24">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#eae8e5]">
+              <h2 className="font-serif text-2xl font-bold text-[#013428]">Order Summary</h2>
+              <span className="text-xs text-[#6b1d30] font-bold bg-[#6b1d30]/10 px-2.5 py-0.5 rounded-full">
+                {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+              </span>
+            </div>
+
+            <div className="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1">
               {cartItems.map((item) => (
-                <div key={item.productId} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                <div key={item.productId} className="flex justify-between items-center py-2.5 border-b border-gray-100 last:border-0">
                   <div className="flex items-center gap-3">
                     {item.image && (
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-12 h-12 rounded-lg object-cover border"
+                        className="w-14 h-14 rounded-xl object-cover border border-[#eae8e5]"
                       />
                     )}
                     <div>
-                      <p className="font-medium text-gray-900 text-sm">{item.name}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="font-medium text-gray-900 text-sm line-clamp-1">{item.name}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
                         {formatCurrency(item.price)} × {item.quantity}
                       </p>
                     </div>
@@ -818,24 +834,30 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            <div className="border-t border-gray-200 pt-4 space-y-2">
-              <div className="flex justify-between text-sm">
+            <div className="border-t border-[#eae8e5] pt-4 space-y-2.5 text-xs sm:text-sm">
+              <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-semibold text-gray-900">{formatCurrency(getTotal())}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Delivery Charges</span>
-                <span className="font-semibold text-emerald-600">Free</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Nationwide Delivery Charges</span>
+                <span className="font-bold text-[#1e6b47] bg-[#e6f4ea] px-2 py-0.5 rounded-full text-xs">FREE</span>
               </div>
-              <div className="border-t border-gray-200 pt-3 mt-3">
+              <div className="border-t border-[#eae8e5] pt-4 mt-3">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-lg font-bold text-gray-900">Total</span>
-                  <span className="text-2xl font-extrabold text-primary-600">
+                  <span className="font-serif text-lg font-bold text-gray-900">Total Payable</span>
+                  <span className="font-serif text-2xl sm:text-3xl font-bold text-[#013428]">
                     {formatCurrency(getTotal())}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Currency: PKR (Pakistani Rupee)</p>
+                <p className="text-[11px] text-gray-500 mt-1">Currency: PKR • Includes cash-on-delivery handling</p>
               </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-[#eae8e5] flex items-center justify-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">🔒 100% Safe Checkout</span>
+              <span>•</span>
+              <span className="flex items-center gap-1">🌸 Handmade Guarantee</span>
             </div>
           </div>
         </div>

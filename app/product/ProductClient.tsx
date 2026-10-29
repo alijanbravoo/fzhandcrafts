@@ -610,9 +610,9 @@ export default function ProductClient() {
               </button>
             </div>
 
-            {/* Accordions Section */}
-            <div className="flex flex-col gap-2.5 pt-2">
-              {/* Accordion 1: Specifications */}
+            {/* Accordions Section on Mobile (only shown on mobile below action buttons, hidden on lg screens where they appear on bottom) */}
+            <div className="flex flex-col gap-2.5 pt-2 lg:hidden">
+              {/* Mobile Accordion 1: Specifications & Materials */}
               <div className="rounded-xl bg-white border border-gray-200 overflow-hidden shadow-xs">
                 <button
                   type="button"
@@ -655,7 +655,7 @@ export default function ProductClient() {
                 )}
               </div>
 
-              {/* Accordion 2: Styling and Wear Guide */}
+              {/* Mobile Accordion 2: Styling and Wear Guide */}
               <div className="rounded-xl bg-white border border-gray-200 overflow-hidden shadow-xs">
                 <button
                   type="button"
@@ -691,7 +691,7 @@ export default function ProductClient() {
                 )}
               </div>
 
-              {/* Accordion 3: Delivery and Packaging */}
+              {/* Mobile Accordion 3: Delivery and Packaging */}
               <div className="rounded-xl bg-white border border-gray-200 overflow-hidden shadow-xs">
                 <button
                   type="button"
@@ -720,6 +720,115 @@ export default function ProductClient() {
               </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* ============================================================== */}
+        {/* DESKTOP BOTTOM SECTION (lg:block): DETAILS & SPECIFICATIONS    */}
+        {/* On computer size display: Material & Specifications, Styling,  */}
+        {/* Shipping & Delivery, and Reviews on the bottom.                */}
+        {/* ============================================================== */}
+        <div className="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-6 mt-14 pt-10 border-t border-gray-200">
+          {/* Card 1: Product Specifications & Materials */}
+          <div className="rounded-2xl bg-white border border-gray-200/90 p-6 shadow-xs flex flex-col">
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="w-8 h-8 rounded-full bg-[#6b1d30]/10 text-[#6b1d30] flex items-center justify-center text-base">
+                ⚙️
+              </span>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-[#013428]">Specifications &amp; Materials</h3>
+                <p className="text-[11px] text-gray-500">Artisan crafted details &amp; dimensions</p>
+              </div>
+            </div>
+            <div className="space-y-3 text-xs text-gray-700 flex-1">
+              <div className="p-3 rounded-xl bg-gray-50 space-y-2.5">
+                <div>
+                  <span className="font-bold text-gray-900 block text-[11px]">Bloom Material</span>
+                  <span>{bloomMaterial}</span>
+                </div>
+                <div className="border-t border-gray-200/70 pt-2">
+                  <span className="font-bold text-gray-900 block text-[11px]">Glitter Flower</span>
+                  <span>{glitterFlower}</span>
+                </div>
+                <div className="border-t border-gray-200/70 pt-2">
+                  <span className="font-bold text-gray-900 block text-[11px]">Weight &amp; Diameter</span>
+                  <span>{weightDiameter}</span>
+                </div>
+                <div className="border-t border-gray-200/70 pt-2">
+                  <span className="font-bold text-gray-900 block text-[11px]">Fastener</span>
+                  <span>{fastener}</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-500 leading-relaxed pt-1">
+                Each piece is lovingly handcrafted at FZhandcrafts with high attention to detail for an authentic festive look.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: Styling & Wear Guide */}
+          <div className="rounded-2xl bg-white border border-gray-200/90 p-6 shadow-xs flex flex-col">
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="w-8 h-8 rounded-full bg-[#ffdead] text-[#4e1220] flex items-center justify-center text-base">
+                ✨
+              </span>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-[#013428]">Styling &amp; Wear Guide</h3>
+                <p className="text-[11px] text-gray-500">Versatile hair &amp; wrist adornment</p>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-gray-50 text-xs text-gray-700 flex-1">
+              <ul className="space-y-3 text-xs leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-[#6b1d30] font-bold mt-0.5">•</span>
+                  <span><strong>Bridal &amp; Wedding:</strong> Tie gently around wrists for Barat, Walima, Mehndi, and Mayun ceremonies.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#6b1d30] font-bold mt-0.5">•</span>
+                  <span><strong>Hair Bun &amp; Chignon:</strong> Wrap around your hair bun or braid for an everlasting floral hairstyle.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#6b1d30] font-bold mt-0.5">•</span>
+                  <span><strong>Festive Attire:</strong> Complements traditional shalwar kameez, lehengas, and sarees.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#6b1d30] font-bold mt-0.5">•</span>
+                  <span><strong>Comfortable Silk Ribbon:</strong> Easy to adjust without irritation or pulling hair.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Card 3: Shipping & Packaging */}
+          <div className="rounded-2xl bg-white border border-gray-200/90 p-6 shadow-xs flex flex-col">
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="w-8 h-8 rounded-full bg-[#e6f4ea] text-[#1e6b47] flex items-center justify-center text-base">
+                📦
+              </span>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-[#013428]">Shipping &amp; Delivery</h3>
+                <p className="text-[11px] text-gray-500">Fast nationwide courier delivery</p>
+              </div>
+            </div>
+            <div className="p-3 rounded-xl bg-gray-50 text-xs text-gray-700 flex-1 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 font-semibold text-[#013428]">
+                  <span className="w-2 h-2 rounded-full bg-[#34a853]"></span>
+                  <span>Nationwide Courier (Pakistan)</span>
+                </div>
+                <p className="leading-relaxed text-gray-700">
+                  Crafting and delivery takes <strong>2-3 working days</strong> across Pakistan.
+                </p>
+                <div className="border-t border-gray-200/70 pt-3">
+                  <p className="leading-relaxed text-gray-500 text-[11px]">
+                    Carefully packed in secure crush-proof protective packaging to ensure your gajray arrive in flawless shape and condition.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 pt-3 border-t border-gray-200/70 flex items-center justify-between text-[11px] text-[#1e6b47] font-semibold">
+                <span>Safe Delivery Guaranteed</span>
+                <span>🚚 Tracked</span>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { FiShoppingCart, FiMenu, FiX, FiUser, FiPackage, FiLogOut } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -19,11 +20,11 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/products', label: 'Products' },
-    { href: '/categories', label: 'Categories' },
+    { href: '/products', label: 'All Gajray' },
+    { href: '/categories', label: 'Collections' },
     { href: '/order-status', label: 'Track Order' },
-    { href: '/about', label: 'About Us' },
-    { href: '/contact', label: 'Contact Us' },
+    { href: '/about', label: 'Our Story' },
+    { href: '/contact', label: 'Contact' },
   ];
 
   // Close user dropdown when clicking outside
@@ -38,25 +39,27 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <nav className="bg-[#6b1d30] text-[#fbf9f6] sticky top-0 z-50 shadow-[0_4px_20px_rgba(78,18,32,0.25)] border-b border-[#ffdead]/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-black text-primary-600 tracking-tight">
-              🌸 FZhandcrafts
+          {/* Brand Emblem */}
+          <Link href="/" className="flex items-center gap-1.5 group">
+            <span className="font-serif text-[22px] sm:text-2xl tracking-tight text-[#ffdead] font-semibold leading-none group-hover:brightness-110 transition-all">
+              FZhandcrafts
             </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ffdead]"></span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex space-x-1 lg:space-x-3">
+          <div className="hidden md:flex space-x-1 lg:space-x-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all ${
                   pathname === link.href
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                    ? 'text-[#4e1220] bg-[#ffdead] shadow-xs'
+                    : 'text-[#fbf9f6]/90 hover:text-[#ffdead] hover:bg-white/10'
                 }`}
               >
                 {link.label}
@@ -64,17 +67,29 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right Actions: User Account + Cart */}
-          <div className="flex items-center space-x-3">
+          {/* Right Actions: WhatsApp + User Account + Cart */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* WhatsApp Quick Chat */}
+            <a
+              href="https://wa.me/923001234567"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Chat on WhatsApp"
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all text-xs font-semibold"
+            >
+              <FaWhatsapp className="w-3.5 h-3.5" />
+              <span>WhatsApp</span>
+            </a>
+
             {/* User Account Menu (Desktop) */}
             <div className="relative hidden sm:block" ref={userMenuRef}>
               {user ? (
                 <div>
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 hover:border-primary-300 hover:bg-gray-50 transition-all text-sm font-semibold text-gray-800"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 hover:border-[#ffdead] hover:bg-white/10 transition-all text-xs font-semibold text-[#fbf9f6]"
                   >
-                    <div className="w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">
+                    <div className="w-5 h-5 rounded-full bg-[#ffdead] text-[#4e1220] flex items-center justify-center text-[10px] font-bold">
                       {displayName.charAt(0).toUpperCase()}
                     </div>
                     <span className="max-w-[100px] truncate">{displayName}</span>
@@ -82,29 +97,29 @@ export default function Navbar() {
 
                   {/* Dropdown */}
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 text-gray-800">
                       <Link
                         href="/account"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-[#6b1d30]/10 hover:text-[#6b1d30]"
                       >
-                        <FiPackage className="w-4 h-4" /> My Orders & Account
+                        <FiPackage className="w-3.5 h-3.5" /> My Orders &amp; Account
                       </Link>
                       <Link
                         href="/order-status"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
+                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-[#6b1d30]/10 hover:text-[#6b1d30]"
                       >
-                        <FiUser className="w-4 h-4" /> Track Order Status
+                        <FiUser className="w-3.5 h-3.5" /> Track Order Status
                       </Link>
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           logout();
                         }}
-                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 border-t border-gray-100 mt-1"
+                        className="w-full text-left flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 border-t border-gray-100 mt-1"
                       >
-                        <FiLogOut className="w-4 h-4" /> Sign Out
+                        <FiLogOut className="w-3.5 h-3.5" /> Sign Out
                       </button>
                     </div>
                   )}
@@ -112,9 +127,9 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-gray-700 hover:text-primary-600 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#fbf9f6] hover:text-[#ffdead] hover:bg-white/10 transition-colors"
                 >
-                  <FiUser className="w-4 h-4" />
+                  <FiUser className="w-3.5 h-3.5" />
                   <span>Sign In</span>
                 </Link>
               )}
@@ -123,12 +138,12 @@ export default function Navbar() {
             {/* Shopping Cart Button */}
             <Link
               href="/cart"
-              className="relative p-2 text-gray-700 hover:text-primary-600 transition-colors rounded-lg hover:bg-gray-50"
+              className="relative p-2 text-[#fbf9f6] hover:text-[#ffdead] transition-colors rounded-full hover:bg-white/10"
               aria-label="Shopping Cart"
             >
-              <FiShoppingCart className="w-6 h-6" />
+              <FiShoppingCart className="w-5 h-5" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                <span className="absolute -top-1 -right-1 bg-[#ffdead] text-[#4e1220] text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-sm">
                   {cartItemCount}
                 </span>
               )}
@@ -136,7 +151,7 @@ export default function Navbar() {
 
             {/* Mobile menu toggle button */}
             <button
-              className="md:hidden p-2 text-gray-700 hover:text-primary-600 rounded-lg"
+              className="md:hidden p-2 text-[#fbf9f6] hover:text-[#ffdead] rounded-lg"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle Navigation Menu"
             >
@@ -147,29 +162,29 @@ export default function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100 space-y-1">
+          <div className="md:hidden py-4 border-t border-white/10 space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`block px-3 py-2.5 rounded-lg text-base font-semibold ${
+                className={`block px-3 py-2.5 rounded-xl text-sm font-semibold ${
                   pathname === link.href
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                    ? 'text-[#4e1220] bg-[#ffdead]'
+                    : 'text-[#fbf9f6] hover:text-[#ffdead] hover:bg-white/10'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
 
-            <div className="pt-3 border-t border-gray-100">
+            <div className="pt-3 border-t border-white/10">
               {user ? (
                 <>
                   <Link
                     href="/account"
                     onClick={() => setIsMenuOpen(false)}
-                    className="block px-3 py-2.5 rounded-lg text-base font-semibold text-primary-600 bg-primary-50 mb-2"
+                    className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-[#4e1220] bg-[#ffdead] mb-2"
                   >
                     👤 My Account ({displayName})
                   </Link>
@@ -178,7 +193,7 @@ export default function Navbar() {
                       setIsMenuOpen(false);
                       logout();
                     }}
-                    className="w-full text-left block px-3 py-2.5 rounded-lg text-base font-semibold text-red-600 hover:bg-red-50"
+                    className="w-full text-left block px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-300 hover:bg-white/10"
                   >
                     Sign Out
                   </button>
@@ -187,7 +202,7 @@ export default function Navbar() {
                 <Link
                   href="/login"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block px-3 py-2.5 rounded-lg text-base font-bold text-center bg-primary-600 text-white hover:bg-primary-700 shadow-sm"
+                  className="block px-3 py-2.5 rounded-xl text-sm font-bold text-center bg-[#ffdead] text-[#4e1220] hover:brightness-105 shadow-sm"
                 >
                   Sign In with Google / Phone
                 </Link>

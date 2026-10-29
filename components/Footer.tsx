@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FiFacebook, FiInstagram, FiTwitter, FiMail, FiPhone } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { getSettings } from '@/lib/firestore';
 
 export default function Footer() {
-  const [contactEmail, setContactEmail] = useState('info@flowershop.com');
+  const [contactEmail, setContactEmail] = useState('info@fzhandcrafts.com');
   const [contactPhone, setContactPhone] = useState('+92 300 1234567');
   const [facebookUrl, setFacebookUrl] = useState<string>('');
   const [facebookLabel, setFacebookLabel] = useState<string>('');
@@ -34,56 +35,87 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-gray-900 text-white mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-xl font-bold mb-4">🌸 FZhandcrafts</h3>
-            <p className="text-gray-400">
-              Beautiful artificial flowers, bouquets and fancy gajray for every occasion.
+    <footer className="bg-[#4e1220] text-[#fbf9f6] border-t border-[#ffdead]/20 mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12">
+          {/* Brand Column */}
+          <div className="space-y-3">
+            <Link href="/" className="flex items-center gap-1.5 group inline-flex">
+              <span className="font-serif text-2xl tracking-tight text-[#ffdead] font-semibold leading-none">
+                FZhandcrafts
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ffdead]"></span>
+            </Link>
+            <p className="text-xs text-[#fbf9f6]/80 leading-relaxed font-light">
+              Artisan handcrafted artificial velvet gajray, luxury floral jewelry, and festive chignon adornments. Stays fresh forever.
             </p>
+            <div className="pt-2 flex items-center gap-2 text-xs text-[#ffdead]">
+              <span>🇵🇰 Delivered across Pakistan</span>
+            </div>
           </div>
 
+          {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><Link href="/" className="hover:text-white">Home</Link></li>
-              <li><Link href="/products" className="hover:text-white">Products</Link></li>
-              <li><Link href="/categories" className="hover:text-white">Categories</Link></li>
-              <li><Link href="/about" className="hover:text-white">About Us</Link></li>
+            <h4 className="font-serif text-sm font-semibold tracking-wider text-[#ffdead] uppercase mb-4">
+              Explore Collections
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#fbf9f6]/80">
+              <li><Link href="/" className="hover:text-[#ffdead] transition-colors">Home Atelier</Link></li>
+              <li><Link href="/products" className="hover:text-[#ffdead] transition-colors">All Floral Gajray</Link></li>
+              <li><Link href="/categories" className="hover:text-[#ffdead] transition-colors">Wedding &amp; Festive Tiers</Link></li>
+              <li><Link href="/about" className="hover:text-[#ffdead] transition-colors">About Our Craft</Link></li>
             </ul>
           </div>
 
+          {/* Customer Service */}
           <div>
-            <h4 className="font-semibold mb-4">Customer Service</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-              <li><Link href="/order-status" className="hover:text-white">Order Tracking</Link></li>
+            <h4 className="font-serif text-sm font-semibold tracking-wider text-[#ffdead] uppercase mb-4">
+              Customer Care
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#fbf9f6]/80">
+              <li><Link href="/contact" className="hover:text-[#ffdead] transition-colors">Contact Atelier</Link></li>
+              <li><Link href="/order-status" className="hover:text-[#ffdead] transition-colors">Live Order Tracker</Link></li>
+              <li><Link href="/cart" className="hover:text-[#ffdead] transition-colors">Shopping Bag</Link></li>
+              <li>
+                <a
+                  href={`https://wa.me/${contactPhone.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#ffdead] transition-colors inline-flex items-center gap-1.5 text-[#25D366]"
+                >
+                  <FaWhatsapp className="w-3.5 h-3.5" />
+                  <span>WhatsApp Concierge</span>
+                </a>
+              </li>
             </ul>
           </div>
 
+          {/* Contact Details */}
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
-            <ul className="space-y-2 text-gray-400">
+            <h4 className="font-serif text-sm font-semibold tracking-wider text-[#ffdead] uppercase mb-4">
+              Contact &amp; Support
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#fbf9f6]/80">
               <li className="flex items-center space-x-2">
-                <FiMail className="w-4 h-4" />
+                <FiMail className="w-4 h-4 text-[#ffdead]" />
                 <span>{contactEmail}</span>
               </li>
               <li className="flex items-center space-x-2">
-                <FiPhone className="w-4 h-4" />
+                <FiPhone className="w-4 h-4 text-[#ffdead]" />
                 <span>{contactPhone}</span>
               </li>
             </ul>
-            <div className="space-y-2 mt-4">
+
+            <div className="flex items-center gap-3 mt-4 pt-3 border-t border-white/10">
               {facebookUrl && (
                 <a
                   href={facebookUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-gray-400 hover:text-white inline-flex items-center gap-2"
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#ffdead] hover:text-[#4e1220] flex items-center justify-center transition-all text-[#fbf9f6]"
+                  title="Facebook"
                 >
-                  <FiFacebook className="w-5 h-5" />
-                  <span className="text-sm">{facebookLabel || 'Facebook'}</span>
+                  <FiFacebook className="w-4 h-4" />
                 </a>
               )}
               {instagramUrl && (
@@ -91,10 +123,10 @@ export default function Footer() {
                   href={instagramUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-gray-400 hover:text-white inline-flex items-center gap-2"
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#ffdead] hover:text-[#4e1220] flex items-center justify-center transition-all text-[#fbf9f6]"
+                  title="Instagram"
                 >
-                  <FiInstagram className="w-5 h-5" />
-                  <span className="text-sm">{instagramLabel || 'Instagram'}</span>
+                  <FiInstagram className="w-4 h-4" />
                 </a>
               )}
               {twitterUrl && (
@@ -102,23 +134,23 @@ export default function Footer() {
                   href={twitterUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-gray-400 hover:text-white inline-flex items-center gap-2"
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#ffdead] hover:text-[#4e1220] flex items-center justify-center transition-all text-[#fbf9f6]"
+                  title="Twitter / X"
                 >
-                  <FiTwitter className="w-5 h-5" />
-                  <span className="text-sm">{twitterLabel || 'X'}</span>
+                  <FiTwitter className="w-4 h-4" />
                 </a>
               )}
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-[#fbf9f6]/60 gap-3">
           <p>&copy; {new Date().getFullYear()} FZhandcrafts. All rights reserved.</p>
+          <p className="flex items-center gap-1">
+            Handcrafted with <span className="text-[#ffdead]">♥</span> in Pakistan
+          </p>
         </div>
       </div>
     </footer>
   );
 }
-
-
-
