@@ -93,9 +93,9 @@ export default function SettingsPage() {
 
   return (
     <AdminProtected>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 flex w-full max-w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 lg:ml-64">
+        <div className="flex-1 lg:ml-64 w-full max-w-full min-w-0 overflow-x-hidden">
           <div className="px-4 sm:px-6 lg:px-8 py-8">
             <h1 className="text-3xl font-bold mb-8">Settings</h1>
 

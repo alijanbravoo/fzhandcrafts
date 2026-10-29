@@ -166,9 +166,9 @@ export default function AdminCustomersPage() {
 
   return (
     <AdminProtected>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 flex w-full max-w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 lg:ml-64">
+        <div className="flex-1 lg:ml-64 w-full max-w-full min-w-0 overflow-x-hidden">
           <div className="px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-4 border-b border-gray-200 mb-6">

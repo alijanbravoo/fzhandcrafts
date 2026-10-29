@@ -119,13 +119,13 @@ export default function ViewOrderClient() {
 
   return (
     <AdminProtected>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 flex w-full max-w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 lg:ml-64">
+        <div className="flex-1 lg:ml-64 w-full max-w-full min-w-0 overflow-x-hidden">
           <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 lg:pt-8">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Order #{orderNumber}</h1>
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 break-words">Order #{orderNumber}</h1>
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={copyCustomerDetails}
                   className="px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5"
@@ -295,22 +295,24 @@ export default function ViewOrderClient() {
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Ordered Items</h3>
                   <div className="space-y-4">
                     {order.items.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-4 py-2 border-b border-gray-100 last:border-0">
-                        <div className="relative w-16 h-16 flex-shrink-0">
-                          <Image
-                            src={normalizeImageUrl(item.image) || 'https://via.placeholder.com/100x100?text=Flower'}
-                            alt={item.productName}
-                            fill
-                            className="object-cover rounded-xl"
-                          />
+                      <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-0">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <Image
+                              src={normalizeImageUrl(item.image) || 'https://via.placeholder.com/100x100?text=Flower'}
+                              alt={item.productName}
+                              fill
+                              className="object-cover rounded-xl"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-gray-900 break-words">{item.productName}</p>
+                            <p className="text-sm text-gray-500">
+                              {formatCurrency(item.price)} × {item.quantity}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-gray-900">{item.productName}</p>
-                          <p className="text-sm text-gray-500">
-                            {formatCurrency(item.price)} × {item.quantity}
-                          </p>
-                        </div>
-                        <div className="font-bold text-base text-gray-900">
+                        <div className="font-bold text-base text-gray-900 sm:text-right">
                           {formatCurrency(item.price * item.quantity)}
                         </div>
                       </div>

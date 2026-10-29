@@ -50,9 +50,9 @@ export default function AdminProductsPage() {
 
   return (
     <AdminProtected>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 flex w-full max-w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 lg:ml-64">
+        <div className="flex-1 lg:ml-64 w-full max-w-full min-w-0 overflow-x-hidden">
           <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 lg:pt-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold">Products Management</h1>

@@ -242,9 +242,9 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminProtected>
-      <div className="min-h-screen bg-gray-50 flex">
+      <div className="min-h-screen bg-gray-50 flex w-full max-w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 lg:ml-64">
+        <div className="flex-1 lg:ml-64 w-full max-w-full min-w-0 overflow-x-hidden">
           <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 lg:pt-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-gray-200 mb-6 gap-4">
@@ -315,35 +315,37 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Date Filter Row */}
-              <div className="flex flex-wrap items-center justify-between pt-3 border-t border-gray-100 gap-4">
-                <div className="flex flex-wrap items-center gap-3 text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-gray-100 gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm">
                   <span className="font-semibold text-gray-700 flex items-center gap-1.5 text-xs uppercase tracking-wider">
                     <FiCalendar className="w-4 h-4 text-primary-600" /> Filter by Date:
                   </span>
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-gray-500">From:</label>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white text-gray-900"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-gray-500">To:</label>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white text-gray-900"
-                    />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-gray-500">From:</label>
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white text-gray-900 w-full sm:w-auto"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-gray-500">To:</label>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white text-gray-900 w-full sm:w-auto"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {(searchQuery || statusFilter !== 'all' || callFilter !== 'all' || startDate || endDate) && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                    className="text-xs font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1 self-start sm:self-auto"
                   >
                     <FiX className="w-3.5 h-3.5" /> Clear All Filters
                   </button>
@@ -362,8 +364,8 @@ export default function AdminOrdersPage() {
                 <p className="text-gray-500 font-medium">No orders match your filter criteria.</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden w-full max-w-full">
+                <div className="overflow-x-auto w-full">
                   <table className="min-w-full divide-y divide-gray-200 text-left text-sm">
                     <thead className="bg-gray-50 text-gray-600 uppercase text-xs font-semibold">
                       <tr>
@@ -397,7 +399,7 @@ export default function AdminOrdersPage() {
                             </td>
 
                             {/* Customer */}
-                            <td className="px-5 py-4 align-top">
+                            <td className="px-5 py-4 align-top min-w-[180px]">
                               <div className="font-semibold text-gray-900">{order.customerName}</div>
                               <div className="text-xs font-mono text-gray-600 mt-0.5">
                                 {formatPakistaniPhone(order.customerPhone)}
@@ -408,7 +410,7 @@ export default function AdminOrdersPage() {
                             </td>
 
                             {/* Order Confirmation Call (Admin only column) */}
-                            <td className="px-5 py-4 align-top">
+                            <td className="px-5 py-4 align-top min-w-[200px]">
                               <div className="space-y-1.5">
                                 <select
                                   value={callStatus}
@@ -432,7 +434,7 @@ export default function AdminOrdersPage() {
                             </td>
 
                             {/* Special Request & Time Slot */}
-                            <td className="px-5 py-4 align-top max-w-[200px]">
+                            <td className="px-5 py-4 align-top min-w-[180px] max-w-xs">
                               {order.preferredCallTime && (
                                 <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 text-[11px] font-bold rounded mb-1">
                                   ⏰ {order.preferredCallTime}
@@ -454,7 +456,7 @@ export default function AdminOrdersPage() {
                             </td>
 
                             {/* Order Status */}
-                            <td className="px-5 py-4 align-top">
+                            <td className="px-5 py-4 align-top min-w-[160px]">
                               <div className="space-y-1">
                                 <select
                                   value={order.status}
