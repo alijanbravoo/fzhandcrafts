@@ -417,8 +417,8 @@ export default function ProductClient() {
                 <a href="#reviews-section" className="text-xs text-gray-500 hover:text-[#013428] font-medium">
                   (1,420 reviews)
                 </a>
-                <span className="bg-[#bdeddb] text-[#002018] text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  🌿 Velvet &amp; Silk Craft
+                <span className="bg-[#bdeddb] text-[#002018] text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center">
+                  Velvet &amp; Silk Craft
                 </span>
               </div>
             </div>
@@ -540,7 +540,7 @@ export default function ProductClient() {
             {/* Video preview if available */}
             {product.youtubeVideoUrl && (
               <div className="rounded-xl overflow-hidden border border-gray-200 bg-white p-3">
-                <h4 className="text-xs font-bold text-gray-800 mb-2">🎥 Product Video Demonstration</h4>
+                <h4 className="text-xs font-bold text-gray-800 mb-2">Product Video Demonstration</h4>
                 <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                   <iframe
                     className="absolute top-0 left-0 w-full h-full"
@@ -620,8 +620,7 @@ export default function ProductClient() {
                   aria-expanded={openAccordions.spec}
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left text-sm font-semibold text-[#013428]"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="text-[#6b1d30] font-bold">⚙️</span>
+                  <span>
                     Product Specifications &amp; Materials
                   </span>
                   <span className={`transform transition-transform text-xs text-gray-500 ${openAccordions.spec ? 'rotate-180' : ''}`}>
@@ -663,8 +662,7 @@ export default function ProductClient() {
                   aria-expanded={openAccordions.style}
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left text-sm font-semibold text-[#013428]"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="text-[#6b1d30] font-bold">✨</span>
+                  <span>
                     Styling &amp; Wear
                   </span>
                   <span className={`transform transition-transform text-xs text-gray-500 ${openAccordions.style ? 'rotate-180' : ''}`}>
@@ -699,8 +697,7 @@ export default function ProductClient() {
                   aria-expanded={openAccordions.ship}
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left text-sm font-semibold text-[#013428]"
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="text-[#6b1d30] font-bold">📦</span>
+                  <span>
                     Delivery &amp; Packaging
                   </span>
                   <span className={`transform transition-transform text-xs text-gray-500 ${openAccordions.ship ? 'rotate-180' : ''}`}>
@@ -731,14 +728,9 @@ export default function ProductClient() {
         <div className="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-6 mt-14 pt-10 border-t border-gray-200">
           {/* Card 1: Product Specifications & Materials */}
           <div className="rounded-2xl bg-white border border-gray-200/90 p-6 shadow-xs flex flex-col">
-            <div className="flex items-center gap-2.5 mb-4">
-              <span className="w-8 h-8 rounded-full bg-[#6b1d30]/10 text-[#6b1d30] flex items-center justify-center text-base">
-                ⚙️
-              </span>
-              <div>
-                <h3 className="font-serif text-lg font-bold text-[#013428]">Specifications &amp; Materials</h3>
-                <p className="text-[11px] text-gray-500">Artisan crafted details &amp; dimensions</p>
-              </div>
+            <div className="mb-4">
+              <h3 className="font-serif text-lg font-bold text-[#013428]">Specifications &amp; Materials</h3>
+              <p className="text-[11px] text-gray-500">Artisan crafted details &amp; dimensions</p>
             </div>
             <div className="space-y-3 text-xs text-gray-700 flex-1">
               <div className="p-3 rounded-xl bg-gray-50 space-y-2.5">
@@ -767,14 +759,9 @@ export default function ProductClient() {
 
           {/* Card 2: Styling & Wear Guide */}
           <div className="rounded-2xl bg-white border border-gray-200/90 p-6 shadow-xs flex flex-col">
-            <div className="flex items-center gap-2.5 mb-4">
-              <span className="w-8 h-8 rounded-full bg-[#ffdead] text-[#4e1220] flex items-center justify-center text-base">
-                ✨
-              </span>
-              <div>
-                <h3 className="font-serif text-lg font-bold text-[#013428]">Styling &amp; Wear Guide</h3>
-                <p className="text-[11px] text-gray-500">Versatile hair &amp; wrist adornment</p>
-              </div>
+            <div className="mb-4">
+              <h3 className="font-serif text-lg font-bold text-[#013428]">Styling &amp; Wear Guide</h3>
+              <p className="text-[11px] text-gray-500">Versatile hair &amp; wrist adornment</p>
             </div>
             <div className="p-3 rounded-xl bg-gray-50 text-xs text-gray-700 flex-1">
               <ul className="space-y-3 text-xs leading-relaxed">
@@ -800,14 +787,9 @@ export default function ProductClient() {
 
           {/* Card 3: Shipping & Packaging */}
           <div className="rounded-2xl bg-white border border-gray-200/90 p-6 shadow-xs flex flex-col">
-            <div className="flex items-center gap-2.5 mb-4">
-              <span className="w-8 h-8 rounded-full bg-[#e6f4ea] text-[#1e6b47] flex items-center justify-center text-base">
-                📦
-              </span>
-              <div>
-                <h3 className="font-serif text-lg font-bold text-[#013428]">Shipping &amp; Delivery</h3>
-                <p className="text-[11px] text-gray-500">Fast nationwide courier delivery</p>
-              </div>
+            <div className="mb-4">
+              <h3 className="font-serif text-lg font-bold text-[#013428]">Shipping &amp; Delivery</h3>
+              <p className="text-[11px] text-gray-500">Fast nationwide courier delivery</p>
             </div>
             <div className="p-3 rounded-xl bg-gray-50 text-xs text-gray-700 flex-1 flex flex-col justify-between">
               <div className="space-y-3">
@@ -826,7 +808,7 @@ export default function ProductClient() {
               </div>
               <div className="mt-4 pt-3 border-t border-gray-200/70 flex items-center justify-between text-[11px] text-[#1e6b47] font-semibold">
                 <span>Safe Delivery Guaranteed</span>
-                <span>🚚 Tracked</span>
+                <span>Tracked</span>
               </div>
             </div>
           </div>

@@ -242,25 +242,21 @@ export default function Home() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-white border border-[#eae8e5] shadow-xs">
-                  <span className="w-8 h-8 rounded-full bg-[#6b1d30]/10 text-[#6b1d30] flex items-center justify-center text-sm mb-2 font-bold">🌸</span>
                   <h4 className="font-serif font-bold text-sm text-[#013428]">Everlasting Velvet</h4>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">Imported crush-proof velvet petals designed to remain fresh event after event.</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-[#eae8e5] shadow-xs">
-                  <span className="w-8 h-8 rounded-full bg-[#ffdead] text-[#4e1220] flex items-center justify-center text-sm mb-2 font-bold">✨</span>
                   <h4 className="font-serif font-bold text-sm text-[#013428]">Glitter Flowers</h4>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">Artisan gold &amp; white glitter floral centerpieces providing radiant festive sparkle.</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-[#eae8e5] shadow-xs">
-                  <span className="w-8 h-8 rounded-full bg-[#013428]/10 text-[#013428] flex items-center justify-center text-sm mb-2 font-bold">🎀</span>
                   <h4 className="font-serif font-bold text-sm text-[#013428]">Silk Ribbon Comfort</h4>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">Ties softly around wrists or chignon hair buns without snagging or pulling hair.</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-white border border-[#eae8e5] shadow-xs">
-                  <span className="w-8 h-8 rounded-full bg-[#e6f4ea] text-[#1e6b47] flex items-center justify-center text-sm mb-2 font-bold">📦</span>
                   <h4 className="font-serif font-bold text-sm text-[#013428]">Protective Delivery</h4>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">Packed in crush-proof presentation boxes delivered nationwide across Pakistan.</p>
                 </div>
