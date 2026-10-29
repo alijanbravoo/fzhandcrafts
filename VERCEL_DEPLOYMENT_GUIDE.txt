@@ -1,0 +1,111 @@
+================================================================================
+  MIGRATING / DEPLOYING FZHANDCRAFTS TO VERCEL (WITH FIREBASE & CUSTOM DOMAIN)
+================================================================================
+
+Since your database/auth is on Firebase and your custom domain is currently
+pointing there, follow these clean, zero-downtime steps to deploy on Vercel.
+
+--------------------------------------------------------------------------------
+STEP 1: PUSH YOUR LATEST CODE TO GITHUB
+--------------------------------------------------------------------------------
+Ensure all the latest design changes (Atelier theme, product layout) are pushed:
+
+  1. Open terminal in your project directory (c:\Users\s2\Downloads\fzhandcrafts).
+  2. Run:
+       git add .
+       git commit -m "Apply atelier theme and layout across entire store"
+       git push origin main
+
+--------------------------------------------------------------------------------
+STEP 2: CREATE A FREE VERCEL ACCOUNT & IMPORT REPOSITORY
+--------------------------------------------------------------------------------
+  1. Go to: https://vercel.com
+  2. Sign in or Sign up using "Continue with GitHub" (the account: alijanbravoo).
+  3. On your Vercel Dashboard, click:
+       [ Add New... ] -> [ Project ]
+  4. Under "Import Git Repository", find:
+       alijanbravoo/fzhandcrafts
+  5. Click [ Import ].
+
+--------------------------------------------------------------------------------
+STEP 3: ADD ENVIRONMENT VARIABLES IN VERCEL
+--------------------------------------------------------------------------------
+Before clicking Deploy, expand the "Environment Variables" section on Vercel
+and enter the following values from your Firebase Project Console
+(Firebase Console -> Project Settings -> General -> Web Apps):
+
+  A. FIREBASE CONFIG:
+     - NEXT_PUBLIC_FIREBASE_API_KEY           = (your apiKey)
+     - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN       = (your authDomain, e.g. fzhandcrafts.firebaseapp.com)
+     - NEXT_PUBLIC_FIREBASE_PROJECT_ID        = (your projectId)
+     - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET    = (your storageBucket, e.g. fzhandcrafts.appspot.com)
+     - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = (your messagingSenderId)
+     - NEXT_PUBLIC_FIREBASE_APP_ID            = (your appId)
+
+  B. META PIXEL & CAPI (Free Server-Side Tracking):
+     - NEXT_PUBLIC_FACEBOOK_PIXEL_ID          = (your Meta Pixel / Dataset ID)
+     - FACEBOOK_CAPI_ACCESS_TOKEN             = (your Meta CAPI token from Events Manager)
+     - FACEBOOK_TEST_EVENT_CODE               = (leave empty for live production)
+
+--------------------------------------------------------------------------------
+STEP 4: DEPLOY THE PROJECT
+--------------------------------------------------------------------------------
+  1. Click the [ Deploy ] button.
+  2. Vercel will install packages, build the Next.js app, and deploy.
+  3. In ~1 to 2 minutes, you will get a live test link:
+       https://fzhandcrafts.vercel.app
+  4. Open this URL and test:
+     - Browsing products
+     - Adding to cart
+     - Tracking page
+
+--------------------------------------------------------------------------------
+STEP 5: SWITCH YOUR CUSTOM DOMAIN FROM FIREBASE TO VERCEL
+--------------------------------------------------------------------------------
+When you are satisfied with the Vercel preview, point your custom domain:
+
+  1. In Vercel Project Dashboard:
+     - Go to: [ Settings ] -> [ Domains ].
+     - Type your domain name (e.g. yourdomain.com and www.yourdomain.com).
+     - Click [ Add ].
+
+  2. Vercel will show you the exact DNS records needed:
+     - For Apex Domain (yourdomain.com):
+         Type: A
+         Name: @
+         Value: 76.76.21.21
+     - For Subdomain (www.yourdomain.com):
+         Type: CNAME
+         Name: www
+         Value: cname.vercel-dns.com
+
+  3. Update DNS at your Domain Registrar (Namecheap, GoDaddy, Cloudflare, etc.):
+     - Log in where you bought your domain.
+     - Go to DNS Management / DNS Records.
+     - Replace the old Firebase A/TXT records with the Vercel records above.
+     - Save changes.
+
+  4. Vercel will automatically generate a free SSL certificate (HTTPS) within
+     a few minutes once the DNS propagates.
+
+--------------------------------------------------------------------------------
+STEP 6: ADD DOMAIN TO FIREBASE AUTH AUTHORIZED DOMAINS
+--------------------------------------------------------------------------------
+To make sure customer login, phone verification, and Google Sign-in work:
+
+  1. Open Firebase Console: https://console.firebase.google.com/
+  2. Select your project.
+  3. Go to: [ Authentication ] -> [ Settings ] tab -> [ Authorized domains ].
+  4. Ensure both are listed:
+       - your-project-name.vercel.app
+       - yourcustomdomain.com (and www.yourcustomdomain.com)
+  5. If missing, click [ Add domain ] and paste them.
+
+--------------------------------------------------------------------------------
+STEP 7: FUTURE UPDATES (AUTOMATIC CI/CD)
+--------------------------------------------------------------------------------
+You never need to manually deploy again:
+  - Any time you run `git push origin main`, Vercel automatically builds and
+    deploys the update in seconds with zero downtime!
+================================================================================
+
