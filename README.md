@@ -1,14 +1,20 @@
-# Flower Shop E-Commerce Website
+# FZhandcrafts - Handcrafted Artificial Gajray & Floral Accessories
 
-A modern, full-featured e-commerce website for a flower shop business built with Next.js, React, TypeScript, and Google Firestore.
+A modern, full-featured e-commerce website for **FZhandcrafts** built with Next.js, React, TypeScript, and Google Firestore.
 
 ## Features
 
 ### Customer Features
 - **Home Page**: Beautiful landing page with featured products
 - **Product Pages**: Browse all products with search and category filters
-- **Product Details**: Detailed product pages with image slideshow
-- **Customer Reviews & Ratings**: 5-star ratings system and customer reviews on products
+- **Product Details (`/product`)**:
+  - Split 1:1 aspect-ratio photo viewer on desktop, touch-swipeable gallery on mobile
+  - Responsive thumbnail gallery strip synchronized with active image
+  - Interactive bundle tiers (1 Pair, 2 Pairs with discount, 3 Pairs with discount)
+  - Full-height action buttons (`h-14` / 56px with `min-h-[56px]` and `flex-shrink-0`) matching WhatsApp button
+  - Non-distorting responsive price block with discount badges and small light green In Stock badge
+  - Sticky bottom purchase bar with live bundle price calculation
+  - Accordion sections for Product Specifications, Styling & Wear, Delivery & Packaging, and Reviews
 - **WhatsApp Floating Chat & Quick Order**: Floating chat button + instant 1-click order via WhatsApp with pre-filled cart & product details
 - **Google / Gmail Authentication**: 1-click Sign-in & account creation with Google
 - **Phone Number Checkout & Accounts**: 11-digit Pakistani phone check (`03...`), automatic phone account generation
@@ -23,7 +29,12 @@ A modern, full-featured e-commerce website for a flower shop business built with
 ### Admin Features
 - **Secure Admin Login**: Firebase Authentication for admin access
 - **Admin Dashboard**: Overview of orders, revenue, and statistics
-- **Product Management**: Add, edit, and delete products
+- **Product Management**:
+  - Add, edit, and delete products
+  - Upload/manage multiple image URLs
+  - Configure sale price and strike-through original compare price
+  - Configurable bundle discount percentages (Tier 2 and Tier 3)
+  - Customizable product specifications (Bloom Material, Glitter Flower, Weight & Diameter, Fastener)
 - **Order Management**: View all orders and update order status
 - **Order Details**: View detailed order information and customer details
 

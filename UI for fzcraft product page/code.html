@@ -1,0 +1,386 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary": "#ffffff", "secondary-container": "#fd7e94", "on-secondary-fixed": "#400013", "tertiary": "#3f2900", "error": "#ba1a1a", "on-error-container": "#93000a", "on-error": "#ffffff", "tertiary-container": "#5b3e00", "primary-fixed": "#bdeddb", "tertiary-fixed": "#ffdead", "surface-container-low": "#f5f3f0", "surface-tint": "#3b6758", "inverse-surface": "#30312f", "on-secondary": "#ffffff", "background": "#fbf9f6", "tertiary-fixed-dim": "#f4bd61", "on-secondary-container": "#74142e", "surface-container-lowest": "#ffffff", "outline-variant": "#c0c8c3", "surface": "#fbf9f6", "inverse-primary": "#a1d0bf", "on-tertiary-fixed-variant": "#604100", "secondary-fixed-dim": "#ffb2bc", "primary-fixed-dim": "#a1d0bf", "secondary": "#a3394f", "error-container": "#ffdad6", "on-tertiary-fixed": "#281900", "on-primary-fixed-variant": "#224e41", "on-surface-variant": "#404945", "surface-dim": "#dbdad7", "on-surface": "#1b1c1a", "on-primary-container": "#8cbaa9", "outline": "#717975", "on-secondary-fixed-variant": "#842039", "on-primary": "#ffffff", "primary": "#013428", "surface-variant": "#e4e2df", "inverse-on-surface": "#f2f0ed", "primary-container": "#1e4b3e", "surface-container": "#efeeeb", "secondary-fixed": "#ffd9dd", "surface-bright": "#fbf9f6", "on-tertiary-container": "#dca84e", "surface-container-high": "#eae8e5", "on-primary-fixed": "#002018", "on-background": "#1b1c1a", "surface-container-highest": "#e4e2df" }, "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, "spacing": { "space-sm": "0.5rem", "gutter-mobile": "1rem", "margin-mobile": "1.25rem", "space-xs": "0.25rem", "margin": "3rem", "space-xl": "2.5rem", "gutter": "1.5rem", "space-md": "1rem", "space-2xl": "4rem", "space-lg": "1.5rem" }, "fontFamily": { "label-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "headline-sm": ["Playfair Display"], "headline-lg": ["Playfair Display"], "headline-md": ["Playfair Display"], "body-lg": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "price-display": ["Plus Jakarta Sans"], "display-lg": ["Playfair Display"], "body-md": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Playfair Display"], "display-lg-mobile": ["Playfair Display"], "body-sm": ["Plus Jakarta Sans"] }, "fontSize": { "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "700" }], "headline-sm": ["22px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "headline-md": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "500" }], "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "600" }], "price-display": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-md": ["15px", { "lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400" }], "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "500" }], "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-[#6b1d30] shadow-[0_2px_12px_rgba(0,0,0,0.18)]"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-1.5 min-w-0 flex-1"><button aria-label="Go Back" class="w-11 h-11 flex shrink-0 items-center justify-center rounded-full text-[#fbf9f6] hover:text-[#ffdead] transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[22px]">arrow_back_ios_new</span></button><div class="flex items-center gap-1.5 shrink-0"><span class="font-headline-sm text-[22px] tracking-tight text-[#ffdead] font-semibold leading-none">fleur<span class="text-[#fbf9f6]">&amp;</span>co</span><span class="w-1.5 h-1.5 rounded-full bg-[#ffdead]"></span></div><span class="h-4 w-px bg-[#ffdead]/30 mx-1"></span><h1 class="font-body-sm text-[13px] leading-snug text-[#fbf9f6]/90 tracking-tight truncate font-medium">Velvet Rose Brooch</h1></div><div class="flex items-center gap-1 shrink-0"><button aria-label="Wishlist" class="relative w-10 h-10 flex items-center justify-center rounded-full text-[#fbf9f6] hover:text-[#ffdead] transition-colors"><span class="material-symbols-outlined text-[22px]">favorite</span><span class="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-[#ffdead] text-[#6b1d30] font-label-sm text-[10px] leading-4 flex items-center justify-center font-bold">0</span></button><button aria-label="Cart" class="relative w-10 h-10 flex items-center justify-center rounded-full text-[#fbf9f6] hover:text-[#ffdead] transition-colors"><span class="material-symbols-outlined text-[22px]">shopping_bag</span><span class="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-[#ffdead] text-[#6b1d30] font-label-sm text-[10px] leading-4 flex items-center justify-center font-bold">1</span></button><div class="w-8 h-8 rounded-full bg-surface-container-lowest/20 border border-[#ffdead]/40 flex items-center justify-center ml-0.5"><span class="material-symbols-outlined text-[#ffdead] text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pb-28 bg-surface min-h-screen pt-16"><div class="flex flex-col w-full">
+<!-- Structured Data JSON-LD for SEO -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "The Everlasting Velvet Rose Brooch & Hairpin",
+    "image": [
+      "https://lh3.googleusercontent.com/aida/AEtjO1XubKGEHrDQ8Dn7wwjVC0JcPSO9M-yu7mq4cf2ZftOxEIo0ZfRrAqvjViI3ZxauLkopkKRSSCuxG1P-kobKlEXU93M04R5sUWrfQxGLq7q6vqsG2b5vTe9KhAegc2zHdbCYulozsRoTkQnVyqr3IufBT1foamQ3B6LFr9eItrTOS07o2DJG0LLMkm8ebkiZBxn1s26CL5RJlX2Zyafyh8B7_jThNZpjBGA82p2tUOo"
+    ],
+    "description": "Meticulously crafted from architectural crush-resistant Italian velvet and brushed brass gold filigree. Versatile dual-attachment pin & hair clasp effortlessly transitions from bridal couture to everyday bespoke elegance.",
+    "brand": {
+      "@type": "Brand",
+      "name": "fleur&co"
+    },
+    "sku": "FLR-VLV-ROSE-01",
+    "offers": {
+      "@type": "Offer",
+      "url": "https://fleurandco.atelier/products/everlasting-velvet-rose",
+      "priceCurrency": "USD",
+      "price": "39.00",
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "1420"
+    }
+  }
+  </script>
+<!-- Editorial Breadcrumbs & Badges -->
+<div class="px-gutter-mobile py-space-sm flex items-center justify-between text-on-surface-variant font-label-md text-label-md">
+<nav aria-label="Breadcrumb" class="truncate max-w-[75%]">
+<ol class="inline-flex items-center gap-1.5 truncate">
+<li class=""><span class="hover:text-primary transition-colors cursor-pointer">Home</span></li>
+<li class="opacity-40">/</li>
+<li class=""><span class="hover:text-primary transition-colors cursor-pointer">Botanicals</span></li>
+<li class="opacity-40">/</li>
+<li class="text-on-surface font-semibold truncate">The Everlasting Rose</li>
+</ol>
+</nav>
+<div class="flex items-center gap-1 text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded-full font-label-sm text-label-sm uppercase">
+<span class="material-symbols-outlined text-[14px]">local_florist</span>
+<span class="">In Stock</span>
+</div>
+</div>
+<!-- Hero Visual Gallery -->
+<section aria-label="Product Media" class="px-gutter-mobile flex flex-col gap-space-sm">
+<div class="relative w-full aspect-square bg-surface-container-high rounded-xl overflow-hidden shadow-sm flex items-center justify-center">
+<!-- Main Product Image -->
+<img alt="The Everlasting Velvet Rose Brooch and Hairpin" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" id="main-product-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A">
+<!-- Floating Atelier Badges -->
+<div class="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+<span class="bg-surface-container-lowest/90 backdrop-blur-md text-secondary font-label-sm text-label-sm px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wider flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          Atelier Handcrafted
+        </span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-full shadow-xs uppercase tracking-tight font-bold">
+          Limited Batch
+        </span>
+</div>
+<!-- Quick Zoom / Tap Hint -->
+<button aria-label="Tap to view zoom" class="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-surface-container-lowest/80 backdrop-blur-md text-on-surface flex items-center justify-center shadow-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">zoom_in</span>
+</button>
+</div>
+<!-- 5-Item Thumbnail Strip -->
+<div aria-label="Thumbnail carousel" class="flex items-center gap-2 overflow-x-auto py-1 scroll-smooth no-scrollbar" role="tablist">
+<button aria-label="Angle overview" aria-selected="true" class="thumb-btn relative shrink-0 w-16 h-16 rounded bg-surface-container-high overflow-hidden shadow-sm ring-2 ring-secondary transition-all" onclick="switchImage('https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A', this)" role="tab">
+<img alt="Angle overview" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A">
+</button>
+<button aria-label="Macro petals and gold filigree" aria-selected="false" class="thumb-btn relative shrink-0 w-16 h-16 rounded bg-surface-container-high overflow-hidden opacity-70 hover:opacity-100 transition-all" onclick="switchImage('https://lh3.googleusercontent.com/aida-public/AB6AXuBWf1xWDGJM-Y1Ou8jCqjG9oTWaygK8Xh2u0cIoBRPzqaacfJBzfuqlEvIK_A99fWR85iqQ04zEx8A9W_5-tSlav6x_35U3Znjil1mt1Q0yJjNCTbtPW3HrPgB4rNDAi3xpK8zVAIwGUAFHUSoeTHilCgZeBflgvnnUpiKtFbQBo2uJ2vdjDAJYDpJn0ykgalZf-ntmNb7T3b1t47YPBqVWpkRs62yiKQmUWT0Pmhg', this)" role="tab">
+<img alt="Macro Petal Detail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWf1xWDGJM-Y1Ou8jCqjG9oTWaygK8Xh2u0cIoBRPzqaacfJBzfuqlEvIK_A99fWR85iqQ04zEx8A9W_5-tSlav6x_35U3Znjil1mt1Q0yJjNCTbtPW3HrPgB4rNDAi3xpK8zVAIwGUAFHUSoeTHilCgZeBflgvnnUpiKtFbQBo2uJ2vdjDAJYDpJn0ykgalZf-ntmNb7T3b1t47YPBqVWpkRs62yiKQmUWT0Pmhg">
+</button>
+<button aria-label="Luxury gift unboxing box" aria-selected="false" class="thumb-btn relative shrink-0 w-16 h-16 rounded bg-surface-container-high overflow-hidden opacity-70 hover:opacity-100 transition-all" onclick="switchImage('https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A', this)" role="tab">
+<img alt="Unboxing emerald box" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A">
+</button>
+<button aria-label="Styling detail view" aria-selected="false" class="thumb-btn relative shrink-0 w-16 h-16 rounded bg-surface-container-high overflow-hidden opacity-70 hover:opacity-100 transition-all" onclick="switchImage('https://lh3.googleusercontent.com/aida-public/AB6AXuBWf1xWDGJM-Y1Ou8jCqjG9oTWaygK8Xh2u0cIoBRPzqaacfJBzfuqlEvIK_A99fWR85iqQ04zEx8A9W_5-tSlav6x_35U3Znjil1mt1Q0yJjNCTbtPW3HrPgB4rNDAi3xpK8zVAIwGUAFHUSoeTHilCgZeBflgvnnUpiKtFbQBo2uJ2vdjDAJYDpJn0ykgalZf-ntmNb7T3b1t47YPBqVWpkRs62yiKQmUWT0Pmhg', this)" role="tab">
+<img alt="Styling view" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWf1xWDGJM-Y1Ou8jCqjG9oTWaygK8Xh2u0cIoBRPzqaacfJBzfuqlEvIK_A99fWR85iqQ04zEx8A9W_5-tSlav6x_35U3Znjil1mt1Q0yJjNCTbtPW3HrPgB4rNDAi3xpK8zVAIwGUAFHUSoeTHilCgZeBflgvnnUpiKtFbQBo2uJ2vdjDAJYDpJn0ykgalZf-ntmNb7T3b1t47YPBqVWpkRs62yiKQmUWT0Pmhg">
+</button>
+<button aria-label="Stem and pin fastener detail" aria-selected="false" class="thumb-btn relative shrink-0 w-16 h-16 rounded bg-surface-container-high overflow-hidden opacity-70 hover:opacity-100 transition-all" onclick="switchImage('https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A', this)" role="tab">
+<img alt="Stem detail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDI3mekfQrsXTX8nC2im17sjoBfmLDlw4SDwEUb3DoIW7aJlM8WXyID25-BRSCwwW_8KdKpz0V8aPJFk9vJFTdpMMDZB4VygP0DReAKBgkrYhnKjGwz1haQYNyu60lBPTJZSs9URsyBuJlJi7cLD3Di_bIOjjlUpz2wlX4a0o1wgb6cVQ1uHxMcPM85m00o3U_2hgqf4katYqzz22fNkugkooN48DRUojyNgzZs_A">
+</button>
+</div>
+</section>
+<!-- Product Details & High Conversion Purchasing Module -->
+<section aria-label="Product Options" class="px-gutter-mobile pt-space-md flex flex-col gap-space-md">
+<!-- Title & Atelier Heritage -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-tertiary-container uppercase tracking-widest font-bold">Limited Botanical Edition</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-secondary">verified</span> Hand-numbered #482
+        </span>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-medium tracking-tight">The Everlasting Velvet Rose Brooch &amp; Hairpin</h2>
+</div>
+<!-- Rating & Social Proof Badges -->
+<div class="flex flex-wrap items-center gap-y-1 gap-x-2.5">
+<div class="flex items-center gap-1 text-on-tertiary-container">
+<span class="material-symbols-outlined text-[18px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold ml-1">4.9</span>
+</div>
+<span class="text-on-surface-variant font-body-sm text-body-sm">(1,420 verified patrons)</span>
+<div class="bg-primary-fixed text-on-primary-fixed-variant px-2.5 py-0.5 rounded-full flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">eco</span>
+<span class="">Eco-Friendly Artisan Craft</span>
+</div>
+</div>
+<!-- SEO Narrative Synopsis -->
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+      Meticulously crafted from architectural crush-resistant Italian velvet and brushed brass gold filigree. Versatile dual-attachment pin &amp; hair clasp effortlessly transitions from bridal couture to everyday bespoke elegance.
+    </p>
+<!-- Bundle & Quantity Tier Selectors -->
+<div class="flex flex-col gap-2 pt-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wider font-semibold">Select Bouquet Quantity</span>
+<span class="font-label-sm text-label-sm text-secondary font-bold">Bundle &amp; Save up to 15%</span>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<!-- Tier 1: Single Item (Default Selected) -->
+<label class="tier-card relative flex flex-col p-3 rounded bg-surface-container-lowest shadow-sm cursor-pointer transition-all duration-200 ring-2 ring-secondary bg-secondary-fixed/20" onclick="selectTier(1, 39.00)">
+<input checked="" class="hidden" name="bundle_tier" type="radio" value="1">
+<span class="font-label-md text-label-md text-primary font-bold">1 Rose</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold mt-1">$39.00</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">$39.00/ea</span>
+<span class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-secondary text-on-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[11px]">check</span>
+</span>
+</label>
+<!-- Tier 2: 2-Pack -->
+<label class="tier-card relative flex flex-col p-3 rounded bg-surface-container-lowest shadow-sm cursor-pointer transition-all duration-200 opacity-90 hover:opacity-100" onclick="selectTier(2, 70.20)">
+<input class="hidden" name="bundle_tier" type="radio" value="2">
+<span class="absolute -top-2 left-2 bg-secondary text-on-secondary font-label-sm text-[9px] px-1.5 py-0.2 rounded-full uppercase tracking-tight font-bold shadow-xs">POPULAR</span>
+<span class="font-label-md text-label-md text-primary font-bold">2 Pack</span>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">$70.20</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-medium mt-0.5">$35.10/ea</span>
+<span class="mt-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-[9px] px-1 rounded text-center">SAVE 10%</span>
+</label>
+<!-- Tier 3: 3-Pack -->
+<label class="tier-card relative flex flex-col p-3 rounded bg-surface-container-lowest shadow-sm cursor-pointer transition-all duration-200 opacity-90 hover:opacity-100" onclick="selectTier(3, 99.45)">
+<input class="hidden" name="bundle_tier" type="radio" value="3">
+<span class="absolute -top-2 left-2 bg-tertiary-container text-on-tertiary-container font-label-sm text-[9px] px-1.5 py-0.2 rounded-full uppercase tracking-tight font-bold shadow-xs">BEST VALUE</span>
+<span class="font-label-md text-label-md text-primary font-bold">3 Pack</span>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">$99.45</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-medium mt-0.5">$33.15/ea</span>
+<span class="mt-1 bg-primary-fixed text-on-primary-fixed font-label-sm text-[9px] px-1 rounded text-center">SAVE 15%</span>
+</label>
+</div>
+</div>
+<!-- Purchase Terms & Value Guarantees Box -->
+<div class="flex flex-col gap-2.5">
+<!-- One-time selection card (Active) -->
+<div class="p-3.5 rounded bg-surface-container-lowest shadow-sm flex flex-col gap-2 cursor-pointer transition-all ring-1.5 ring-secondary" id="plan-onetime" onclick="selectPlan('onetime')">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-on-secondary">
+<span class="material-symbols-outlined text-[12px]">check</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">One-time purchase</span>
+</div>
+<span class="font-price-display text-price-display text-primary" id="display-price-onetime">$39.00</span>
+</div>
+<ul class="flex flex-col gap-1.5 pl-6 pt-1 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">card_giftcard</span>
+<span class="">Includes embossed luxury emerald keepsake box ($12 value)</span>
+</li>
+<li class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">handshake</span>
+<span class="">Handcrafted on demand by master florists (Dispatched within 24h)</span>
+</li>
+<li class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+<span class="">Backed by our signature 10-Year Everlasting Bloom Guarantee</span>
+</li>
+</ul>
+</div>
+<!-- Subscribe & Save Option -->
+<div class="p-3.5 rounded bg-surface-container-low shadow-xs flex items-center justify-between cursor-pointer transition-all opacity-85 hover:opacity-100" id="plan-sub" onclick="selectPlan('sub')">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="w-2 h-2 rounded-full bg-transparent"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-medium">Seasonal Botanical Refresh</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Quarterly fresh silk release • Skip or cancel anytime</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-lg text-label-lg text-secondary font-bold">$35.10</span>
+<span class="font-label-sm text-label-sm text-primary">Save 10%</span>
+</div>
+</div>
+</div>
+<!-- Quick Purchase Trust Bar -->
+<div class="grid grid-cols-3 gap-2 py-1 text-center font-label-sm text-label-sm text-on-surface-variant">
+<div class="flex flex-col items-center gap-1 p-2 rounded bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px] text-primary">lock</span>
+<span class="">256-Bit Encrypted</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px] text-primary">eco</span>
+<span class="">Carbon Neutral</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px] text-primary">assignment_return</span>
+<span class="">30-Day Atelier Trial</span>
+</div>
+</div>
+</section>
+<!-- Below-the-fold Editorial & Technical Accordions -->
+<section aria-label="Atelier Craft Specifications" class="px-gutter-mobile pt-space-lg flex flex-col gap-3">
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest font-bold">Provenance &amp; Details</span>
+<h3 class="font-headline-md text-headline-md text-primary">Artisanal Mastercraft</h3>
+</div>
+<!-- Accordion Group -->
+<div class="flex flex-col gap-2 pt-1">
+<!-- Accordion 1: Specifications (Expanded by Default) -->
+<div class="rounded bg-surface-container-lowest shadow-sm overflow-hidden transition-all">
+<button aria-expanded="true" class="w-full px-4 py-3.5 flex items-center justify-between text-left font-label-lg text-label-lg text-primary" onclick="toggleAccordion('acc-spec', this)">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-secondary">tune</span>
+            Product Specifications &amp; Materials
+          </span>
+<span class="material-symbols-outlined text-[20px] transition-transform rotate-180 acc-icon">expand_more</span>
+</button>
+<div class="px-4 pb-4 flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant" id="acc-spec">
+<div class="grid grid-cols-2 gap-2 p-2.5 rounded bg-surface-container-low">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface block font-semibold">Bloom Material</span>
+<span class="">Crush-proof Italian Micro-Velvet</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface block font-semibold">Hardware Metal</span>
+<span class="">18K Electroplated Brass Filigree</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface block font-semibold">Weight &amp; Diameter</span>
+<span class="">28g • 7.5cm (approx 3.0 in)</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface block font-semibold">Fastener Type</span>
+<span class="">Dual-action hairpin clasp &amp; safety pin</span>
+</div>
+</div>
+<p class="leading-relaxed">
+            Every petal is individually heat-shaped and hand-curled by master ateliers in small runs of 50 pieces, guaranteeing true botanical authenticity without organic decay.
+          </p>
+</div>
+</div>
+<!-- Accordion 2: Styling Guide -->
+<div class="rounded bg-surface-container-lowest shadow-sm overflow-hidden transition-all">
+<button aria-expanded="false" class="w-full px-4 py-3.5 flex items-center justify-between text-left font-label-lg text-label-lg text-primary" onclick="toggleAccordion('acc-style', this)">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-secondary">style</span>
+            Styling &amp; Multi-Way Wear Guide
+          </span>
+<span class="material-symbols-outlined text-[20px] transition-transform acc-icon">expand_more</span>
+</button>
+<div class="hidden px-4 pb-4 flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant" id="acc-style">
+<ul class="flex flex-col gap-2 list-disc pl-4">
+<li class=""><strong>Chignon Crown:</strong> Slide hairpin fork directly into structured hair buns or braided crowns for wedding &amp; gala attire.</li>
+<li class=""><strong>Tailored Blazer Lapel:</strong> Fasten the safety brooch clasp through heavy linen, wool, or cashmere coats for an avant-garde flair.</li>
+<li class=""><strong>Silk Scarf Anchor:</strong> Pin securely through silk foulards to hold delicate drape folds in high winds.</li>
+</ul>
+</div>
+</div>
+<!-- Accordion 3: Packaging & Guarantee -->
+<div class="rounded bg-surface-container-lowest shadow-sm overflow-hidden transition-all">
+<button aria-expanded="false" class="w-full px-4 py-3.5 flex items-center justify-between text-left font-label-lg text-label-lg text-primary" onclick="toggleAccordion('acc-ship', this)">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-secondary">inventory_2</span>
+            Shipping, Packaging &amp; Bloom Guarantee
+          </span>
+<span class="material-symbols-outlined text-[20px] transition-transform acc-icon">expand_more</span>
+</button>
+<div class="hidden px-4 pb-4 flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant" id="acc-ship">
+<p class="">
+            Ships nestled inside our rigid emerald collector box with embossed gold foil details. 100% plastic-free packaging made from recycled pulp. Includes a certificate of authenticity and complimentary seasonal petal-scenting vial.
+          </p>
+<div class="p-2.5 rounded bg-primary-fixed/40 text-on-primary-fixed-variant flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="font-label-sm text-label-sm">If your bloom loses shape within 10 years, return it for complimentary atelier reshapping.</span>
+</div>
+</div>
+</div><div class="rounded bg-surface-container-lowest shadow-sm overflow-hidden transition-all"><button aria-expanded="false" class="w-full px-4 py-3.5 flex items-center justify-between text-left font-label-lg text-label-lg text-primary" onclick="toggleAccordion('acc-reviews', this)"><span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px] text-secondary">reviews</span><span class="">Customer Reviews &amp; Testimonials (1,420)</span></span><span class="material-symbols-outlined text-[20px] transition-transform acc-icon">expand_more</span></button><div class="hidden px-4 pb-4 flex flex-col gap-3 font-body-sm text-body-sm text-on-surface-variant" id="acc-reviews"><div class="flex items-center justify-between p-3 rounded bg-surface-container-low"><div class="flex flex-col"><div class="flex items-baseline gap-1.5"><span class="font-headline-md text-headline-md text-primary font-bold leading-none">4.9</span><span class="font-label-sm text-label-sm text-on-surface-variant">/ 5.0</span></div><div class="flex items-center text-on-tertiary-container mt-1"><span class="material-symbols-outlined text-[16px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[16px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[16px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[16px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[16px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span></div><span class="text-[11px] text-on-surface-variant mt-0.5">Based on 1,420 ratings</span></div><div class="flex flex-col gap-1 w-1/2"><div class="flex items-center gap-1.5 text-[10px]"><span class="w-3 text-right">5★</span><div class="flex-1 h-2 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-secondary rounded-full w-[94%]"></div></div><span class="w-6 text-right">94%</span></div><div class="flex items-center gap-1.5 text-[10px]"><span class="w-3 text-right">4★</span><div class="flex-1 h-2 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-secondary rounded-full w-[5%]"></div></div><span class="w-6 text-right">5%</span></div><div class="flex items-center gap-1.5 text-[10px]"><span class="w-3 text-right">3★</span><div class="flex-1 h-2 rounded-full bg-surface-container-highest overflow-hidden"><div class="h-full bg-secondary rounded-full w-[1%]"></div></div><span class="w-6 text-right">1%</span></div></div></div><div class="flex flex-col gap-2.5 pt-1"><div class="p-3 rounded bg-surface-container-low/60 flex flex-col gap-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-1.5"><span class="font-label-md text-label-md text-on-surface font-semibold">Eleanor V.</span><span class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] px-1.5 py-0.2 rounded font-medium flex items-center gap-0.5"><span class="material-symbols-outlined text-[11px]">check_circle</span>Verified Patron</span></div><span class="text-[11px] text-on-surface-variant">2 days ago</span></div><div class="flex items-center text-on-tertiary-container"><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span></div><p class="font-body-sm text-[12px] leading-relaxed text-on-surface-variant">Wore this both in my hair for our anniversary gala and pinned on my silk lapel the next evening. The Italian micro-velvet has a deep, regal texture and the gold filigree clasp holds securely without tugging hair.</p></div><div class="p-3 rounded bg-surface-container-low/60 flex flex-col gap-1.5"><div class="flex items-center justify-between"><div class="flex items-center gap-1.5"><span class="font-label-md text-label-md text-on-surface font-semibold">Genevieve M.</span><span class="bg-primary-fixed text-on-primary-fixed-variant text-[10px] px-1.5 py-0.2 rounded font-medium flex items-center gap-0.5"><span class="material-symbols-outlined text-[11px]">check_circle</span>Verified Patron</span></div><span class="text-[11px] text-on-surface-variant">1 week ago</span></div><div class="flex items-center text-on-tertiary-container"><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span><span class="material-symbols-outlined text-[14px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span></div><p class="font-body-sm text-[12px] leading-relaxed text-on-surface-variant">The emerald collector gift box is sublime. It arrived within 24 hours and looks even more breathtaking in person than in photographs. Heirloom quality craftsmanship!</p></div></div></div></div>
+</div>
+</section>
+<!-- Editorial Brand Story & Craft Spotlight -->
+<section class="mx-gutter-mobile mt-space-lg mb-space-md p-5 rounded-lg bg-surface-container-high shadow-xs flex flex-col gap-3">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[20px]">brush</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest font-bold">The fleur&amp;co Promise</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Wearable Everlasting Floristry</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+      Unlike fragile fresh roses that wither after sunset, our botanicals capture the poetic zenith of a full spring bloom forever. Designed for heirloom longevity, worn across generations.
+    </p>
+<div class="flex items-center gap-3 pt-1">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-label-sm text-[10px] ring-2 ring-surface">FC</div>
+<div class="w-8 h-8 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary font-label-sm text-[10px] ring-2 ring-surface">AT</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-sm text-[10px] ring-2 ring-surface">99%</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">99.4% Patron Recommendation</span>
+</div>
+</section>
+<!-- Micro-interactions Script -->
+<script>
+    function switchImage(src, btn) {
+      const mainImg = document.getElementById('main-product-image');
+      if (mainImg) {
+        mainImg.style.opacity = '0.5';
+        setTimeout(() => {
+          mainImg.src = src;
+          mainImg.style.opacity = '1';
+        }, 150);
+      }
+      document.querySelectorAll('.thumb-btn').forEach(el => {
+        el.classList.remove('ring-2', 'ring-secondary', 'opacity-100');
+        el.classList.add('opacity-70');
+      });
+      btn.classList.add('ring-2', 'ring-secondary', 'opacity-100');
+      btn.classList.remove('opacity-70');
+    }
+
+    function toggleAccordion(id, btn) {
+      const content = document.getElementById(id);
+      const icon = btn.querySelector('.acc-icon');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        content.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    function selectTier(count, price) {
+      const cards = document.querySelectorAll('.tier-card');
+      cards.forEach(c => {
+        c.classList.remove('ring-2', 'ring-secondary', 'bg-secondary-fixed/20');
+        c.classList.add('opacity-90');
+      });
+      event.currentTarget.classList.add('ring-2', 'ring-secondary', 'bg-secondary-fixed/20');
+      event.currentTarget.classList.remove('opacity-90');
+      
+      const priceDisplay = document.getElementById('display-price-onetime');
+      if (priceDisplay) {
+        priceDisplay.textContent = '$' + price.toFixed(2);
+      }
+    }
+
+    function selectPlan(type) {
+      const onetime = document.getElementById('plan-onetime');
+      const sub = document.getElementById('plan-sub');
+      if (type === 'onetime') {
+        onetime.classList.add('ring-1.5', 'ring-secondary', 'bg-surface-container-lowest');
+        onetime.classList.remove('bg-surface-container-low', 'opacity-85');
+        sub.classList.remove('ring-1.5', 'ring-secondary', 'bg-surface-container-lowest');
+        sub.classList.add('bg-surface-container-low', 'opacity-85');
+      } else {
+        sub.classList.add('ring-1.5', 'ring-secondary', 'bg-surface-container-lowest');
+        sub.classList.remove('bg-surface-container-low', 'opacity-85');
+        onetime.classList.remove('ring-1.5', 'ring-secondary', 'bg-surface-container-lowest');
+        onetime.classList.add('bg-surface-container-low', 'opacity-85');
+      }
+    }
+  </script>
+</div></main><aside class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-6px_24px_rgba(30,75,62,0.08)]"><div class="flex items-center justify-between gap-space-md h-20 px-gutter-mobile max-w-md mx-auto"><div class="flex flex-col"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Ready to ship</span><span class="font-price-display text-price-display text-primary">$39.00</span></div><button aria-label="Order Now — $39.00" class="flex-1 h-12 px-space-lg rounded-full bg-primary-container text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-[0_8px_20px_rgba(30,75,62,0.25)] hover:scale-[1.01] active:scale-[0.98] transition-all"><span class="material-symbols-outlined text-[20px]">local_mall</span><span class="">Order Now — $39.00</span></button></div></aside>
+
+</body></html>

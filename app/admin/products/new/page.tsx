@@ -21,10 +21,17 @@ export default function NewProductPage() {
     name: '',
     description: '',
     price: '',
+    comparePrice: '',
+    bundleDiscountTier2: '10',
+    bundleDiscountTier3: '15',
     category: '',
     images: [''],
     youtubeVideoUrl: '',
     inStock: true,
+    bloomMaterial: 'Imported Crush-proof Velvet',
+    glitterFlower: 'White and gold glitter flower',
+    weightDiameter: 'Weight 140g, 5in diameter',
+    fastener: 'Soft silk ribbon',
   });
 
   const handleImageChange = (index: number, value: string) => {
@@ -63,9 +70,18 @@ export default function NewProductPage() {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
+        comparePrice: formData.comparePrice ? parseFloat(formData.comparePrice) : undefined,
+        bundleDiscountTier2: formData.bundleDiscountTier2 ? parseFloat(formData.bundleDiscountTier2) : 10,
+        bundleDiscountTier3: formData.bundleDiscountTier3 ? parseFloat(formData.bundleDiscountTier3) : 15,
         category: formData.category,
         images,
         inStock: formData.inStock,
+        specifications: {
+          bloomMaterial: formData.bloomMaterial,
+          glitterFlower: formData.glitterFlower,
+          weightDiameter: formData.weightDiameter,
+          fastener: formData.fastener,
+        },
       };
 
       if (formData.youtubeVideoUrl && formData.youtubeVideoUrl.trim() !== '') {
@@ -152,10 +168,10 @@ export default function NewProductPage() {
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (PKR) *
+                  Price (PKR / Rs.) *
                 </label>
                 <input
                   type="number"
@@ -170,6 +186,22 @@ export default function NewProductPage() {
               </div>
 
               <div>
+                <label htmlFor="comparePrice" className="block text-sm font-medium text-gray-700 mb-2">
+                  Original / Strike-through Price (PKR / Rs.)
+                </label>
+                <input
+                  type="number"
+                  id="comparePrice"
+                  step="0.01"
+                  min="0"
+                  placeholder="e.g. 3200"
+                  value={formData.comparePrice}
+                  onChange={(e) => setFormData({ ...formData, comparePrice: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white text-black"
+                />
+              </div>
+
+              <div>
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
                   Category *
                 </label>
@@ -179,9 +211,99 @@ export default function NewProductPage() {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="e.g., Roses, Bouquets, Arrangements"
+                  placeholder="e.g., Gajray, Bouquets, Flowers"
                   className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-black bg-white text-black"
                 />
+              </div>
+            </div>
+
+            {/* Bundle Tier Discounts */}
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <h3 className="text-sm font-bold text-gray-800 mb-2">📦 Bundle Discounts</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    2-Pack / 2 Pairs Discount %
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={formData.bundleDiscountTier2}
+                    onChange={(e) => setFormData({ ...formData, bundleDiscountTier2: e.target.value })}
+                    placeholder="e.g. 10"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    3-Pack / 3 Pairs Discount %
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={formData.bundleDiscountTier3}
+                    onChange={(e) => setFormData({ ...formData, bundleDiscountTier3: e.target.value })}
+                    placeholder="e.g. 15"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-black"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Specifications */}
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <h3 className="text-sm font-bold text-gray-800 mb-2">⚙️ Product Specifications</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Bloom Material
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.bloomMaterial}
+                    onChange={(e) => setFormData({ ...formData, bloomMaterial: e.target.value })}
+                    placeholder="e.g. Imported Crush-proof Velvet"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Glitter Flower / Hardware
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.glitterFlower}
+                    onChange={(e) => setFormData({ ...formData, glitterFlower: e.target.value })}
+                    placeholder="e.g. White and gold glitter flower"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Weight & Diameter
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.weightDiameter}
+                    onChange={(e) => setFormData({ ...formData, weightDiameter: e.target.value })}
+                    placeholder="e.g. Weight 140g, 5in diameter"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Fastener
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.fastener}
+                    onChange={(e) => setFormData({ ...formData, fastener: e.target.value })}
+                    placeholder="e.g. Soft silk ribbon"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-black"
+                  />
+                </div>
               </div>
             </div>
 

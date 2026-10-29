@@ -41,11 +41,26 @@
 ### Pages Updated
 - Home page
 - Products page
-- Product detail page
+- **Product detail page** (`app/product/ProductClient.tsx`)
+  - ✅ Split 1:1 aspect-ratio photo viewer on desktop, responsive stacking on mobile
+  - ✅ Smooth horizontal swipe carousel with minimal hidden `<>` navigation buttons
+  - ✅ Photo thumbnail strip displaying small icons for all product views
+  - ✅ Non-distorting responsive price block with discount badges and in-stock indicator
+  - ✅ Small light green "In Stock" badge at page apex
+  - ✅ Interactive quantity bundle tiers (1 Pair, 2 Pairs with 10% discount, 3 Pairs with 15% discount)
+  - ✅ Fixed button height (`h-14` / 56px with `min-h-[56px]`, `flex-shrink-0`, and `whitespace-nowrap`) for Order Now & WhatsApp buttons to prevent compression/auto-decreasing height on narrow mobile screens (<400px)
+  - ✅ Sticky bottom container enhanced with minimum height (`min-h-[56px]`), safe-area padding (`pb-safe`), and clean spacing to guarantee permanent button visibility without shrinking
+  - ✅ Fixed sticky bottom bar with real-time price synchronization and safe-area padding
+  - ✅ Accordion details tailored for handcrafted Velvet Artificial Gajray (specs, styling & wear, delivery in 2-3 days, reviews)
+  - ✅ Full branding updated to **FZhandcrafts**
 - Cart page
 - Checkout page
 - Categories page
-- All admin pages
+- **All admin product pages** (`app/admin/products/new/page.tsx`, `app/admin/products/edit/EditProductClient.tsx`)
+  - ✅ Full control to edit title, description, category, and multiple image URLs
+  - ✅ Editable sale price and strike-through original compare price
+  - ✅ Configurable bundle discount percentages (Tier 2 and Tier 3)
+  - ✅ Configurable product specifications (Bloom Material, Glitter Flower, Weight & Diameter, Fastener)
 
 ## ✅ PWA (Progressive Web App) Support
 

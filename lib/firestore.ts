@@ -22,10 +22,19 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  comparePrice?: number;
   category: string;
   images: string[];
   youtubeVideoUrl?: string; // Optional YouTube video link
   inStock: boolean;
+  bundleDiscountTier2?: number; // e.g. 10 (percentage) or custom price for 2 pairs
+  bundleDiscountTier3?: number; // e.g. 15 (percentage) or custom price for 3 pairs
+  specifications?: {
+    bloomMaterial?: string;
+    glitterFlower?: string;
+    weightDiameter?: string;
+    fastener?: string;
+  };
   createdAt?: Timestamp;
 }
 
