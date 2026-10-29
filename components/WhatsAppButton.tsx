@@ -13,13 +13,13 @@ interface WhatsAppButtonProps {
 
 export default function WhatsAppButton({ customMessage, phoneNumber }: WhatsAppButtonProps) {
   const pathname = usePathname();
+  const [isMounted, setIsMounted] = useState(false);
   const [waNumber, setWaNumber] = useState<string>('923001234567');
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // Hide exclusively on the product page to avoid overlapping with the sticky order bar and action buttons
-  if (pathname === '/product' || pathname?.startsWith('/product/')) {
-    return null;
-  }
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (phoneNumber) {
@@ -42,6 +42,16 @@ export default function WhatsAppButton({ customMessage, phoneNumber }: WhatsAppB
 
     loadSettings();
   }, [phoneNumber]);
+
+  // Prevent hydration mismatch: render nothing until mounted on client
+  if (!isMounted) {
+    return null;
+  }
+
+  // Hide exclusively on the product page to avoid overlapping with the sticky order bar and action buttons
+  if (pathname === '/product' || pathname?.startsWith('/product/')) {
+    return null;
+  }
 
   const defaultText = customMessage || 'Hi FZhandcrafts! 🌸 I am browsing your website and have a question.';
   const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(defaultText)}`;
