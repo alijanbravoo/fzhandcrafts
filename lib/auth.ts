@@ -91,6 +91,54 @@ export const logout = async (): Promise<void> => {
   return await signOut(auth);
 };
 
+// Permanent Super Admin that cannot be removed by anyone
+export const SUPER_ADMIN_EMAIL = 'alijanbravo@gmail.com'.toLowerCase();
+
+export interface AdminUserRecord {
+  email: string;
+  role: 'super_admin' | 'admin';
+  addedBy?: string;
+  createdAt?: any;
+  isActive: boolean;
+}
+
+/**
+ * Check if a given user object or email has authorized admin privileges.
+ * 1. Checks if the email matches the permanent Super Admin (alijanbravo@gmail.com).
+ * 2. If not, checks the Firestore `admins` collection for an active admin entry.
+ */
+export const checkIsAdmin = async (userOrEmail: User | string | null | undefined): Promise<boolean> => {
+  if (!userOrEmail) return false;
+
+  const email = (typeof userOrEmail === 'string' ? userOrEmail : userOrEmail.email || '')
+    .toLowerCase()
+    .trim();
+
+  if (!email) return false;
+
+  // 1. Permanent Super Admin is always authorized
+  if (email === SUPER_ADMIN_EMAIL) {
+    return true;
+  }
+
+  // 2. Query Firestore 'admins' collection
+  try {
+    const { doc, getDoc } = await import('firebase/firestore');
+    const { db } = await import('./firebase');
+    const adminDocRef = doc(db, 'admins', email);
+    const snap = await getDoc(adminDocRef);
+
+    if (snap.exists()) {
+      const data = snap.data() as AdminUserRecord;
+      return data.isActive !== false;
+    }
+  } catch (err) {
+    console.error('Error verifying admin status:', err);
+  }
+
+  return false;
+};
+
 // Get current user promise helper
 export const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve) => {

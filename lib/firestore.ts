@@ -432,4 +432,54 @@ export const getCustomerOrders = async (params: {
   }
 };
 
+// ==========================================
+// Admin Team Management
+// ==========================================
+
+export interface AdminAccount {
+  email: string;
+  role: 'super_admin' | 'admin';
+  addedBy: string;
+  createdAt?: Timestamp;
+  isActive: boolean;
+}
+
+export const getAdminAccounts = async (): Promise<AdminAccount[]> => {
+  try {
+    const adminsRef = collection(db, 'admins');
+    const snap = await getDocs(adminsRef);
+    return snap.docs.map((d) => ({ email: d.id, ...(d.data() as Omit<AdminAccount, 'email'>) }));
+  } catch (err) {
+    console.error('Error fetching admin accounts:', err);
+    return [];
+  }
+};
+
+export const addAdminAccount = async (email: string, addedBy: string): Promise<void> => {
+  const cleanEmail = email.toLowerCase().trim();
+  if (!cleanEmail || !cleanEmail.includes('@')) {
+    throw new Error('Please enter a valid email address');
+  }
+
+  const adminDocRef = doc(db, 'admins', cleanEmail);
+  await setDoc(adminDocRef, {
+    email: cleanEmail,
+    role: 'admin',
+    addedBy: addedBy.toLowerCase().trim(),
+    createdAt: Timestamp.now(),
+    isActive: true,
+  });
+};
+
+export const removeAdminAccount = async (email: string): Promise<void> => {
+  const cleanEmail = email.toLowerCase().trim();
+  if (cleanEmail === 'alijanbravo@gmail.com') {
+    throw new Error('Action Prohibited: The Super Admin cannot be removed.');
+  }
+
+  const adminDocRef = doc(db, 'admins', cleanEmail);
+  await deleteDoc(adminDocRef);
+};
+
+
 
