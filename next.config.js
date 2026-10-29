@@ -42,7 +42,7 @@ const nextConfig = {
       'i.imgur.com',
       'imgur.com',
     ],
-    formats: ['image/avif', 'image/webp'],
+    unoptimized: true,
   },
 }
 
