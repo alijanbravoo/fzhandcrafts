@@ -37,7 +37,7 @@ Since you attached your custom domain `fz-flower.shop`:
 
 ## 🔒 Step 2: Update Firestore Security Rules
 
-To allow customers to submit reviews, place orders, and browse products without permissions errors:
+To enforce secure role-based admin access (where only authorized Gmail accounts and the permanent Super Admin `alijanbravo@gmail.com` can edit data):
 
 1. In the [Firebase Console](https://console.firebase.google.com/), click **Firestore Database** in the left menu.
 2. Click on the **Rules** tab at the top.
@@ -48,30 +48,50 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Products: anyone can read, only admin can create/edit
+    // Check if the signed-in user is an authorized admin
+    // 1. Permanent Super Admin: alijanbravo@gmail.com
+    // 2. Or email exists in the /admins collection with isActive == true
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email.lower() == 'alijanbravo@gmail.com' ||
+        (exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())).data.isActive != false)
+      );
+    }
+
+    // Admins Collection:
+    // Only authenticated users can read (to check admin status), only admins can manage
+    match /admins/{adminEmail} {
+      allow read: if request.auth != null;
+      // Super admin can never be modified or deleted by anyone
+      allow create, update: if isAdmin() && adminEmail != 'alijanbravo@gmail.com';
+      allow delete: if isAdmin() && adminEmail != 'alijanbravo@gmail.com';
+    }
+
+    // Products: anyone can read, only authorized admins can create/edit/delete
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
     
-    // Orders: anyone can create, admins & customer owners can view/manage
+    // Orders: anyone can create (for guest checkout), only authorized admins can update status or call logs
     match /orders/{orderId} {
       allow read: if true;
       allow create: if true;
-      allow update: if request.auth != null;
+      allow update: if isAdmin();
     }
     
     // Reviews: anyone can read and post reviews
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if true;
-      allow update, delete: if request.auth != null;
+      allow update, delete: if isAdmin();
     }
     
-    // Settings: anyone can read (e.g. WhatsApp number, cover photo), only admin can edit
+    // Settings: anyone can read (WhatsApp number, banner, etc.), only authorized admins can edit
     match /settings/{docId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
     
     // Counters: order numbering

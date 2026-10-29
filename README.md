@@ -27,16 +27,28 @@ A modern, full-featured e-commerce website for **FZhandcrafts** built with Next.
 - **Contact Us**: Contact form and business information
 
 ### Admin Features
-- **Secure Admin Login**: Firebase Authentication for admin access
-- **Admin Dashboard**: Overview of orders, revenue, and statistics
+- **Strict Role-Based Admin Access**:
+  - Only authorized Google (Gmail) accounts can access the Admin Dashboard
+  - **Permanent Super Admin**: `alijanbravo@gmail.com` (cannot be modified or removed by anyone)
+  - **Multi-Admin Management**: Super admin can authorize/revoke additional admin team Gmail accounts from `/admin/settings`
+  - Route guards (`AdminProtected`) and Firestore security rules block unauthorized customers and arbitrary accounts
+- **Admin Dashboard**: Overview of orders, revenue, and statistics with responsive text/card scaling
 - **Product Management**:
   - Add, edit, and delete products
-  - Upload/manage multiple image URLs
+  - Upload/manage multiple image URLs (including automatic Google Drive link conversion)
   - Configure sale price and strike-through original compare price
   - Configurable bundle discount percentages (Tier 2 and Tier 3)
   - Customizable product specifications (Bloom Material, Glitter Flower, Weight & Diameter, Fastener)
-- **Order Management**: View all orders and update order status
-- **Order Details**: View detailed order information and customer details
+- **Order Management**:
+  - Confirmation call logging (Pending, Picked & Confirmed, Picked & Cancelled, Not Picked, Hung Up)
+  - Cancellation reason capture (preset reasons + custom explanation)
+  - Date range filters and search by order #, phone, or customer name
+  - Direct 1-click customer dialing (`tel:`)
+  - Export filtered orders to CSV
+- **Customer Directory**:
+  - Unified customer profiles with total spend (LTV), order history, and contact details
+  - 1-click delivery slip copying and direct WhatsApp launch
+  - Export customer list to CSV
 
 ### Technical Features
 - **Google Firestore Database**: Cloud-based NoSQL database
@@ -82,27 +94,61 @@ Set up your Firestore security rules in Firebase Console:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Products - readable by all, writable by authenticated admins
+    
+    // Check if user is an authorized admin
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email.lower() == 'alijanbravo@gmail.com' ||
+        (exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())) &&
+         get(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())).data.isActive != false)
+      );
+    }
+
+    // Admins Collection - Super Admin cannot be deleted/modified
+    match /admins/{adminEmail} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin() && adminEmail != 'alijanbravo@gmail.com';
+    }
+
+    // Products - readable by all, writable only by authorized admins
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
     
-    // Orders - readable/writable by authenticated users (admin)
+    // Orders - readable by all, creatable for guest checkout, updates restricted to admins
     match /orders/{orderId} {
-      allow read: if request.auth != null;
-      allow create: if true; // Allow customers to create orders
-      allow update: if request.auth != null; // Only admins can update
+      allow read: if true;
+      allow create: if true;
+      allow update: if isAdmin();
+    }
+    
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+    
+    // Settings (banner, contacts)
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Counters
+    match /counters/{counterId} {
+      allow read, write: if true;
     }
   }
 }
 ```
 
-### 4. Create Admin User
+### 4. Admin Access & Super Admin
 
-1. Go to Firebase Console > Authentication
-2. Add a user with email and password
-3. Use these credentials to log in to the admin panel at `/admin/login`
+1. **Super Admin**: The email `alijanbravo@gmail.com` is permanently configured as Super Admin.
+2. Go to `/admin/login` and click **"Sign In with Authorized Gmail"**.
+3. Once logged in, navigate to **Settings** (`/admin/settings`) to add or remove additional admin team Gmail accounts under **Admin Team & Access Controls**.
 
 ### 5. Meta Pixel (Optional)
 
