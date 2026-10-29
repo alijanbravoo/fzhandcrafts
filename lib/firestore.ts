@@ -78,12 +78,33 @@ export interface OrderItem {
 }
 
 // Products
-export const getProducts = async (): Promise<Product[]> => {
+// In-memory cache for ultra-fast instant product retrieval on client transitions
+let cachedProducts: Product[] | null = null;
+let lastProductsFetchTime = 0;
+const CACHE_DURATION_MS = 60 * 1000; // 60 seconds memory cache
+
+export const clearProductCache = () => {
+  cachedProducts = null;
+  lastProductsFetchTime = 0;
+};
+
+export const getProducts = async (forceRefresh = false): Promise<Product[]> => {
+  const now = Date.now();
+  if (!forceRefresh && cachedProducts && (now - lastProductsFetchTime < CACHE_DURATION_MS)) {
+    return cachedProducts;
+  }
+
   try {
     const productsRef = collection(db, 'products');
     const snapshot = await getDocs(query(productsRef, orderBy('createdAt', 'desc')));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    cachedProducts = products;
+    lastProductsFetchTime = Date.now();
+    return products;
   } catch (error) {
+    if (cachedProducts) {
+      return cachedProducts; // Return stale cache if network hiccup
+    }
     console.error('Error fetching products:', error);
     throw new Error('Failed to fetch products. Please check your internet connection and try again.');
   }
@@ -94,6 +115,13 @@ export const getProduct = async (id: string): Promise<Product | null> => {
     if (!id) {
       throw new Error('Product ID is required');
     }
+
+    // Check fast in-memory cache first
+    if (cachedProducts) {
+      const found = cachedProducts.find(p => p.id === id);
+      if (found) return found;
+    }
+
     const docRef = doc(db, 'products', id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -114,6 +142,7 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
 };
 
 export const addProduct = async (product: Omit<Product, 'id' | 'createdAt'>): Promise<string> => {
+  clearProductCache();
   const productsRef = collection(db, 'products');
   const cleanData: Record<string, any> = {
     name: product.name,
@@ -134,6 +163,7 @@ export const addProduct = async (product: Omit<Product, 'id' | 'createdAt'>): Pr
 };
 
 export const updateProduct = async (id: string, product: Partial<Product>): Promise<void> => {
+  clearProductCache();
   const docRef = doc(db, 'products', id);
   const cleanData: Record<string, any> = {};
   for (const [key, value] of Object.entries(product)) {
@@ -145,6 +175,7 @@ export const updateProduct = async (id: string, product: Partial<Product>): Prom
 };
 
 export const deleteProduct = async (id: string): Promise<void> => {
+  clearProductCache();
   const docRef = doc(db, 'products', id);
   await deleteDoc(docRef);
 };
