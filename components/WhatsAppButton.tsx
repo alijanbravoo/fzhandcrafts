@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { FaWhatsapp } from 'react-icons/fa';
 import { getSettings } from '@/lib/firestore';
 import { cleanWhatsAppNumber } from '@/lib/utils';
@@ -11,8 +12,14 @@ interface WhatsAppButtonProps {
 }
 
 export default function WhatsAppButton({ customMessage, phoneNumber }: WhatsAppButtonProps) {
+  const pathname = usePathname();
   const [waNumber, setWaNumber] = useState<string>('923001234567');
   const [showTooltip, setShowTooltip] = useState(false);
+
+  // Hide exclusively on the product page to avoid overlapping with the sticky order bar and action buttons
+  if (pathname === '/product' || pathname?.startsWith('/product/')) {
+    return null;
+  }
 
   useEffect(() => {
     if (phoneNumber) {
