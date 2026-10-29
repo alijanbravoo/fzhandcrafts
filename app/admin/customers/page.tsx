@@ -55,32 +55,34 @@ export default function AdminCustomersPage() {
 
   // Group orders into unique customers
   const customers: CustomerSummary[] = useMemo(() => {
+    if (!orders || !Array.isArray(orders)) return [];
     const customerMap = new Map<string, CustomerSummary>();
 
     orders.forEach((order) => {
+      if (!order) return;
       // Key primarily on phone number (or email/name if phone absent)
-      const cleanedPhone = cleanPhoneNumber(order.customerPhone);
-      const key = cleanedPhone || (order.customerEmail ? order.customerEmail.toLowerCase().trim() : order.customerName.toLowerCase().trim());
+      const cleanedPhone = cleanPhoneNumber(order.customerPhone || '');
+      const key = cleanedPhone || (order.customerEmail ? order.customerEmail.toLowerCase().trim() : (order.customerName ? order.customerName.toLowerCase().trim() : 'unknown'));
 
       const orderDate = order.createdAt?.toDate ? order.createdAt.toDate() : null;
 
       if (!customerMap.has(key)) {
         customerMap.set(key, {
           id: key,
-          name: order.customerName,
-          phone: order.customerPhone,
-          email: isPhoneAccountEmail(order.customerEmail) ? '' : order.customerEmail,
-          address: order.customerAddress,
+          name: order.customerName || 'Anonymous Customer',
+          phone: order.customerPhone || '',
+          email: isPhoneAccountEmail(order.customerEmail || '') ? '' : (order.customerEmail || ''),
+          address: order.customerAddress || '',
           orderCount: 1,
           totalSpent: order.total || 0,
-          orderNumbers: [order.orderNumber],
+          orderNumbers: order.orderNumber ? [order.orderNumber] : [],
           lastOrderDate: orderDate,
         });
       } else {
         const existing = customerMap.get(key)!;
         existing.orderCount += 1;
         existing.totalSpent += (order.total || 0);
-        if (!existing.orderNumbers.includes(order.orderNumber)) {
+        if (order.orderNumber && !existing.orderNumbers.includes(order.orderNumber)) {
           existing.orderNumbers.push(order.orderNumber);
         }
         // Update to latest address and name if more recent
@@ -101,14 +103,15 @@ export default function AdminCustomersPage() {
 
   // Search filtering
   const filteredCustomers = useMemo(() => {
+    if (!customers || !Array.isArray(customers)) return [];
     if (!searchQuery.trim()) return customers;
     const query = searchQuery.toLowerCase().trim();
 
     return customers.filter((customer) => {
-      const matchName = customer.name.toLowerCase().includes(query);
-      const matchPhone = cleanPhoneNumber(customer.phone).includes(cleanPhoneNumber(query));
-      const matchEmail = customer.email.toLowerCase().includes(query);
-      const matchOrderNum = customer.orderNumbers.some((num) => num.toLowerCase().includes(query));
+      const matchName = (customer.name || '').toLowerCase().includes(query);
+      const matchPhone = cleanPhoneNumber(customer.phone || '').includes(cleanPhoneNumber(query));
+      const matchEmail = (customer.email || '').toLowerCase().includes(query);
+      const matchOrderNum = (customer.orderNumbers || []).some((num) => (num || '').toLowerCase().includes(query));
 
       return matchName || matchPhone || matchEmail || matchOrderNum;
     });
@@ -189,18 +192,30 @@ export default function AdminCustomersPage() {
             </div>
 
             {/* Quick Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">Total Unique Customers</span>
-                <p className="text-2xl font-black text-gray-900 mt-1">{customers.length}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm min-w-0">
+                <span className="text-xs font-bold uppercase text-gray-500 tracking-wider break-words block">
+                  Total Unique Customers
+                </span>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mt-1 truncate">
+                  {customers.length}
+                </p>
               </div>
-              <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">Total Orders Placed</span>
-                <p className="text-2xl font-black text-primary-600 mt-1">{orders.length}</p>
+              <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm min-w-0">
+                <span className="text-xs font-bold uppercase text-gray-500 tracking-wider break-words block">
+                  Total Orders Placed
+                </span>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-black text-primary-600 mt-1 truncate">
+                  {orders.length}
+                </p>
               </div>
-              <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">Total Customer Revenue</span>
-                <p className="text-2xl font-black text-emerald-600 mt-1">{formatCurrency(totalCustomerSpend)}</p>
+              <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm min-w-0 sm:col-span-2 md:col-span-1">
+                <span className="text-xs font-bold uppercase text-gray-500 tracking-wider break-words block">
+                  Total Customer Revenue
+                </span>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 mt-1 truncate" title={formatCurrency(totalCustomerSpend)}>
+                  {formatCurrency(totalCustomerSpend)}
+                </p>
               </div>
             </div>
 
@@ -260,11 +275,11 @@ export default function AdminCustomersPage() {
                           <td className="px-6 py-4 align-top">
                             <div className="flex items-start gap-3">
                               <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-sm">
-                                {customer.name.charAt(0).toUpperCase()}
+                                {(customer.name || 'C').charAt(0).toUpperCase()}
                               </div>
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-bold text-gray-900 text-base">{customer.name}</span>
+                                  <span className="font-bold text-gray-900 text-base">{customer.name || 'Anonymous Customer'}</span>
                                   <button
                                     onClick={() => copyToClipboard(customer.name, 'Name', `name-${customer.id}`)}
                                     title="Copy Name"

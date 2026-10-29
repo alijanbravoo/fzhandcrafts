@@ -46,17 +46,17 @@ export default function Navbar() {
   return (
     <nav className="bg-[#6b1d30] text-[#fbf9f6] sticky top-0 z-50 shadow-[0_4px_20px_rgba(78,18,32,0.25)] border-b border-[#ffdead]/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-2">
           {/* Brand Emblem */}
-          <Link href="/" className="flex items-center gap-1.5 group">
-            <span className="font-serif text-[22px] sm:text-2xl tracking-tight text-[#ffdead] font-semibold leading-none group-hover:brightness-110 transition-all">
+          <Link href="/" className="flex items-center gap-1.5 group min-w-0 max-w-[60%] sm:max-w-none">
+            <span className="font-serif text-[20px] sm:text-2xl tracking-tight text-[#ffdead] font-semibold leading-none group-hover:brightness-110 transition-all truncate">
               FZhandcrafts
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#ffdead]"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ffdead] shrink-0"></span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex space-x-1 lg:space-x-2">
+          <div className="hidden md:flex space-x-1 lg:space-x-2 shrink-0">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -73,7 +73,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Actions: WhatsApp + User Account + Cart */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             {/* WhatsApp Quick Chat */}
             <a
               href="https://wa.me/923001234567"
@@ -143,7 +143,7 @@ export default function Navbar() {
             {/* Shopping Cart Button */}
             <Link
               href="/cart"
-              className="relative p-2 text-[#fbf9f6] hover:text-[#ffdead] transition-colors rounded-full hover:bg-white/10"
+              className="relative p-2 text-[#fbf9f6] hover:text-[#ffdead] transition-colors rounded-full hover:bg-white/10 shrink-0"
               aria-label="Shopping Cart"
             >
               <FiShoppingCart className="w-5 h-5" />
@@ -156,7 +156,7 @@ export default function Navbar() {
 
             {/* Mobile menu toggle button */}
             <button
-              className="md:hidden p-2 text-[#fbf9f6] hover:text-[#ffdead] rounded-lg"
+              className="md:hidden p-2 text-[#fbf9f6] hover:text-[#ffdead] rounded-lg shrink-0 flex items-center justify-center"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle Navigation Menu"
             >

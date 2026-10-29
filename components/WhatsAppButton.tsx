@@ -48,8 +48,8 @@ export default function WhatsAppButton({ customMessage, phoneNumber }: WhatsAppB
     return null;
   }
 
-  // Hide exclusively on the product page to avoid overlapping with the sticky order bar and action buttons
-  if (pathname === '/product' || pathname?.startsWith('/product/')) {
+  // Hide across all admin routes and product page to avoid overlapping with admin controls or sticky buy bars
+  if (pathname?.startsWith('/admin') || pathname === '/product' || pathname?.startsWith('/product/')) {
     return null;
   }
 

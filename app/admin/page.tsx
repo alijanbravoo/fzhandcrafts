@@ -55,36 +55,46 @@ export default function AdminDashboard() {
 
           <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 lg:pt-8">
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">Total Revenue</p>
-                  <p className="text-2xl font-bold text-primary-600 mt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 min-w-0">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs sm:text-sm font-medium uppercase tracking-wider break-words">
+                    Total Revenue
+                  </p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-primary-600 mt-1 sm:mt-2 truncate" title={formatCurrency(totalRevenue)}>
                     {formatCurrency(totalRevenue)}
                   </p>
                 </div>
-                <FiDollarSign className="w-12 h-12 text-primary-600 opacity-50" />
+                <FiDollarSign className="w-10 h-10 sm:w-12 sm:h-12 text-primary-600 opacity-40 shrink-0" />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">Total Orders</p>
-                  <p className="text-2xl font-bold text-blue-600 mt-2">{totalOrders}</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 min-w-0">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs sm:text-sm font-medium uppercase tracking-wider break-words">
+                    Total Orders
+                  </p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-blue-600 mt-1 sm:mt-2 truncate">
+                    {totalOrders}
+                  </p>
                 </div>
-                <FiPackage className="w-12 h-12 text-blue-600 opacity-50" />
+                <FiPackage className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 opacity-40 shrink-0" />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">Pending Orders</p>
-                  <p className="text-2xl font-bold text-yellow-600 mt-2">{pendingOrders}</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 min-w-0 sm:col-span-2 md:col-span-1">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs sm:text-sm font-medium uppercase tracking-wider break-words">
+                    Pending Orders
+                  </p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-yellow-600 mt-1 sm:mt-2 truncate">
+                    {pendingOrders}
+                  </p>
                 </div>
-                <FiUsers className="w-12 h-12 text-yellow-600 opacity-50" />
+                <FiUsers className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600 opacity-40 shrink-0" />
               </div>
             </div>
           </div>
