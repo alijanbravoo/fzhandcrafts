@@ -515,7 +515,6 @@ export default function CheckoutPage() {
   }
 
   if (cartItems.length === 0) {
-  if (cartItems.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center bg-white border border-[#eae8e5] p-10 sm:p-14 rounded-3xl max-w-lg mx-auto shadow-xs">
