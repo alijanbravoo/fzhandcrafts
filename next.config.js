@@ -32,8 +32,6 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',
-  trailingSlash: true,
   images: {
     domains: [
       'images.unsplash.com',
@@ -44,7 +42,7 @@ const nextConfig = {
       'i.imgur.com',
       'imgur.com',
     ],
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
   },
 }
 
