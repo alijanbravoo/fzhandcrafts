@@ -6,6 +6,36 @@ export const FB_PIXEL_ID =
   process.env.NEXT_PUBLIC_META_PIXEL_ID ||
   '';
 
+/**
+ * Read cookie by name in browser
+ */
+export function getCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  const match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+  return match ? decodeURIComponent(match[3]) : undefined;
+}
+
+/**
+ * Get or construct Meta click ID (_fbc) from cookie or url query parameter
+ */
+export function getFbc(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const existingCookie = getCookie('_fbc');
+  if (existingCookie) return existingCookie;
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fbclid = params.get('fbclid');
+    if (fbclid) {
+      // Standard Meta format: fb.subdomainIndex.creationTime.fbclid
+      return `fb.1.${Date.now()}.${fbclid}`;
+    }
+  } catch (e) {
+    // Ignore URL parse error
+  }
+  return undefined;
+}
+
 // Track PageView in browser
 export const pageview = () => {
   if (typeof window !== 'undefined' && (window as any).fbq && FB_PIXEL_ID) {
@@ -30,7 +60,7 @@ export const event = (
 
 /**
  * Dispatch an event to both the browser Pixel AND the server-side Conversions API (CAPI)
- * with the exact same eventId so Meta can deduplicate them accurately.
+ * with the exact same eventId, fbp, and fbc so Meta can deduplicate them accurately.
  */
 export async function trackHybridEvent({
   eventName,
@@ -46,17 +76,24 @@ export async function trackHybridEvent({
     firstName?: string;
     lastName?: string;
     city?: string;
+    externalId?: string;
+    fbp?: string;
+    fbc?: string;
   };
   customData?: Record<string, any>;
 }) {
-  // 1. Browser Pixel Track
+  // 1. Browser Pixel Track with matching eventID
   try {
     event(eventName, customData, eventId);
   } catch (err) {
     console.warn('[Pixel] Error tracking client event:', err);
   }
 
-  // 2. Server CAPI Track
+  // 2. Extract _fbp and _fbc cookies from browser for server deduplication
+  const fbp = userData.fbp || getCookie('_fbp');
+  const fbc = userData.fbc || getFbc();
+
+  // 3. Server CAPI Track
   try {
     const res = await fetch('/api/fb-events', {
       method: 'POST',
@@ -66,7 +103,11 @@ export async function trackHybridEvent({
       body: JSON.stringify({
         eventName,
         eventId,
-        userData,
+        userData: {
+          ...userData,
+          fbp,
+          fbc,
+        },
         customData,
         sourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
       }),

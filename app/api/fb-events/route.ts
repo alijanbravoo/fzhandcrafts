@@ -19,13 +19,21 @@ export async function POST(req: NextRequest) {
     const userAgent = req.headers.get('user-agent') || '';
     const referer = req.headers.get('referer') || '';
 
+    // Extract _fbp and _fbc cookies from payload or request cookies for deduplication
+    const fbp = body.userData?.fbp || req.cookies.get('_fbp')?.value;
+    const fbc = body.userData?.fbc || req.cookies.get('_fbc')?.value;
+
     const result = await sendCapiEvent({
       eventName: body.eventName,
       eventId: body.eventId,
       sourceUrl: body.sourceUrl || referer,
       clientIp,
       userAgent,
-      userData: body.userData || {},
+      userData: {
+        ...(body.userData || {}),
+        fbp,
+        fbc,
+      },
       customData: body.customData || {},
     });
 

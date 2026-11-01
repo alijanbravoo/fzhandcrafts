@@ -24,6 +24,7 @@ export default function ProductClient() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [whatsappNumber, setWhatsappNumber] = useState('923001234567');
+  const hasTrackedView = useRef<string | null>(null);
   
   // Gallery state
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -61,17 +62,20 @@ export default function ProductClient() {
 
         if (productData) {
           setProduct(productData);
-          trackHybridEvent({
-            eventName: 'ViewContent',
-            eventId: `view_${productData.id}_${Date.now()}`,
-            customData: {
-              content_name: productData.name,
-              content_ids: [productData.id || ''],
-              content_type: 'product',
-              value: productData.price,
-              currency: 'PKR',
-            },
-          });
+          if (hasTrackedView.current !== productData.id) {
+            hasTrackedView.current = productData.id || 'tracked';
+            trackHybridEvent({
+              eventName: 'ViewContent',
+              eventId: `view_${productData.id}_${Date.now()}`,
+              customData: {
+                content_name: productData.name,
+                content_ids: [productData.id || ''],
+                content_type: 'product',
+                value: productData.price,
+                currency: 'PKR',
+              },
+            });
+          }
         } else {
           toast.error('Product not found');
           router.push('/products');

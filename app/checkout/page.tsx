@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -72,6 +72,7 @@ export default function CheckoutPage() {
 
   const [accountPassword, setAccountPassword] = useState('');
   const [savingAccount, setSavingAccount] = useState(false);
+  const hasFiredInitiateCheckout = useRef(false);
 
   const triggerConfetti = () => {
     try {
@@ -124,8 +125,9 @@ export default function CheckoutPage() {
       }
     }
 
-    // Fire Meta InitiateCheckout hybrid event
-    if (cartItems.length > 0) {
+    // Fire Meta InitiateCheckout hybrid event strictly once per checkout session
+    if (cartItems.length > 0 && !hasFiredInitiateCheckout.current) {
+      hasFiredInitiateCheckout.current = true;
       const checkoutEventId = `initiate_checkout_${Date.now()}`;
       trackHybridEvent({
         eventName: 'InitiateCheckout',
@@ -134,6 +136,7 @@ export default function CheckoutPage() {
           email: user?.email || undefined,
           phone: isPhoneUser ? phoneNumber : undefined,
           firstName: displayName || undefined,
+          externalId: user?.uid || (isPhoneUser && phoneNumber ? phoneNumber : undefined),
         },
         customData: {
           currency: 'PKR',
@@ -147,7 +150,7 @@ export default function CheckoutPage() {
         },
       });
     }
-  }, [user, displayName, isPhoneUser, phoneNumber]);
+  }, [user, displayName, isPhoneUser, phoneNumber, cartItems.length]);
 
   const handlePhoneChange = (val: string) => {
     setFormData({ ...formData, customerPhone: val });
@@ -259,6 +262,7 @@ export default function CheckoutPage() {
           phone: cleanedPhone,
           firstName: formData.customerName.trim(),
           city: formData.customerAddress.trim(),
+          externalId: user?.uid || cleanedPhone,
         },
         customData: {
           currency: 'PKR',

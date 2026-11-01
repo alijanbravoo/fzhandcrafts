@@ -51,6 +51,9 @@ export interface CapiEventPayload {
     firstName?: string;
     lastName?: string;
     city?: string;
+    externalId?: string;
+    fbp?: string;
+    fbc?: string;
   };
   customData?: {
     currency?: string;
@@ -99,6 +102,22 @@ export async function sendCapiEvent(payload: CapiEventPayload) {
 
   const hashedCity = hashData(payload.userData.city);
   if (hashedCity) userDataPayload.ct = [hashedCity];
+
+  // Meta fbp & fbc for deduplication & attribution (DO NOT HASH per Meta specifications)
+  if (payload.userData.fbp) {
+    userDataPayload.fbp = payload.userData.fbp;
+  }
+  if (payload.userData.fbc) {
+    userDataPayload.fbc = payload.userData.fbc;
+  }
+
+  // External ID for deduplication and cross-device matching
+  if (payload.userData.externalId) {
+    const hashedExternalId = hashData(payload.userData.externalId);
+    if (hashedExternalId) {
+      userDataPayload.external_id = [hashedExternalId];
+    }
+  }
 
   const eventData: Record<string, any> = {
     event_name: payload.eventName,
