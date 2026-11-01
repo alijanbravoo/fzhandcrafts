@@ -150,16 +150,23 @@ service cloud.firestore {
 2. Go to `/admin/login` and click **"Sign In with Authorized Gmail"**.
 3. Once logged in, navigate to **Settings** (`/admin/settings`) to add or remove additional admin team Gmail accounts under **Admin Team & Access Controls**.
 
-### 5. Meta Pixel (Optional)
+### 5. Meta Pixel & Conversions API (CAPI) Deduplication
 
-To add Meta Pixel tracking:
+The website features an automated hybrid tracking setup combining the **Meta Browser Pixel** with **Server-Side Conversions API (CAPI)**.
 
-1. Get your Meta Pixel ID from Facebook Business Manager
-2. Add it to `.env.local`:
+#### How Deduplication Works & Why Meta "Drops" the Duplicate:
+When both browser and server send the same conversion (e.g., `AddToCart`, `Purchase`, `InitiateCheckout`):
+1. Both payloads include the exact same `event_name` and identical `event_id` (along with `_fbp` and `_fbc` cookie linkage).
+2. Meta receives the first event (usually the browser pixel) and processes it.
+3. When the second event arrives (from server CAPI), Meta recognizes the matching `event_id` and **drops the second redundant event** to prevent double-counting your conversions, inflating metrics, or over-reporting ROAS.
+4. **This is completely normal and the intended behavior** of Meta's deduplication algorithm.
 
-```env
-NEXT_PUBLIC_META_PIXEL_ID=your_pixel_id
-```
+#### Configuring Meta Tracking:
+You can configure tracking directly from the store **Admin Settings** (`/admin/settings`):
+- **Meta Pixel / Dataset ID**: `1145868156876626`
+- **Conversions API Access Token**: Generate in Meta Events Manager > Settings > Conversions API > *Generate access token* and paste into Admin Settings (or as `FACEBOOK_CAPI_ACCESS_TOKEN` in Vercel).
+- **Test Event Code**: When testing, copy the code from the *Test Events* tab (e.g., `TEST12345`) and paste it into Admin Settings or append `?test_event_code=TEST12345` to test URLs. Clear it when done.
+- **Diagnostic Endpoint**: Check `https://your-domain/api/fb-events` in your browser at any time to verify server CAPI connection status.
 
 ### 6. Run the Development Server
 

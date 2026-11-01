@@ -117,6 +117,21 @@
 - Touch-friendly spacing
 - Readable font sizes
 
+## 📊 Meta Pixel & Conversions API (CAPI) Deduplication
+
+### Problem Identified
+1. **Missing Server Events in Events Manager**: Conversions API events were not appearing in the Test Events tab because Meta's Graph API requires an active `ACCESS_TOKEN` and a dynamic `test_event_code` to stream into the real-time test window.
+2. **Dropped AddToCart Events**: When users clicked "Order Now", synchronous route navigation (`router.push('/checkout')`) aborted in-flight `fetch('/api/fb-events')` network requests before they could reach the backend, causing 5 fewer server events than pixel events.
+3. **Missing Deduplication Keys**: `_fbp` (browser ID) and `_fbc` (click ID) cookies were not forwarded to server payloads, lowering Meta's event match quality score.
+4. **Duplicate Client Firing**: PageView fired twice on initial page load (inline `<Script>` tag + `useEffect`), and InitiateCheckout re-fired whenever user authentication resolved.
+
+### Solution Implemented
+1. **Admin Settings Integration**: Added a direct configuration panel in `/admin/settings` where store admins can manage their Meta Pixel ID (`1145868156876626`), Conversions API Access Token (`EAAG...`), and Test Event Code without redeploying Vercel.
+2. **Fetch Keepalive**: Added `keepalive: true` to `trackHybridEvent` in `lib/fpixel.ts` so in-flight server requests complete in the background even when navigating to checkout.
+3. **Cookie Bridge**: Added `_fbp` and `_fbc` cookie extraction in browser and server route handlers, forwarding them unhashed to Meta CAPI alongside hashed user data (`em`, `ph`, `external_id`).
+4. **Single-Fire Event Guards**: Used `useRef` guards on `InitiateCheckout` and `ViewContent` so each user interaction fires strictly once with a matching `event_id`.
+5. **Deduplication Confirmation ("Event Dropped")**: Confirmed that Meta showing the second event as **"Dropped / Deduplicated"** is 100% normal and expected—it proves Meta matched both events with the identical `event_id` and prevented double-counting conversions.
+
 ## 🔧 Technical Details
 
 ### Dependencies Added
