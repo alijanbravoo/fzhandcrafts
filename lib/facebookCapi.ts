@@ -73,12 +73,40 @@ export interface CapiEventPayload {
  * Sends a server-side event to Meta Conversions API
  */
 export async function sendCapiEvent(payload: CapiEventPayload) {
-  if (!PIXEL_ID || !ACCESS_TOKEN) {
-    // Graceful skip if credentials are not configured yet
+  // 1. Resolve credentials from environment or Firestore settings
+  let pixelId =
+    process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID ||
+    process.env.NEXT_PUBLIC_META_PIXEL_ID ||
+    PIXEL_ID;
+  let accessToken = process.env.FACEBOOK_CAPI_ACCESS_TOKEN || ACCESS_TOKEN;
+  let testCode = payload.testEventCode || process.env.FACEBOOK_TEST_EVENT_CODE || TEST_EVENT_CODE;
+
+  // Check Firestore settings if env vars are missing
+  if (!pixelId || !accessToken || !testCode) {
+    try {
+      const { getSettings } = await import('./firestore');
+      const settings = await getSettings();
+      if (!pixelId && settings.metaPixelId) pixelId = settings.metaPixelId;
+      if (!accessToken && settings.metaCapiAccessToken) accessToken = settings.metaCapiAccessToken;
+      if (!testCode && settings.metaTestEventCode) testCode = settings.metaTestEventCode;
+    } catch (e) {
+      // Ignore if Firestore is not available
+    }
+  }
+
+  // Fallback to verified Pixel ID from user's Meta account
+  if (!pixelId) {
+    pixelId = '1145868156876626';
+  }
+
+  if (!pixelId || !accessToken) {
+    // Graceful skip if access token is not configured yet
     return {
       success: false,
       skipped: true,
-      message: 'Meta Pixel ID or CAPI Access Token not configured yet.',
+      message: 'Meta CAPI Access Token is not configured yet. Add it in Admin Settings or as FACEBOOK_CAPI_ACCESS_TOKEN in Vercel.',
+      pixelId,
+      hasToken: Boolean(accessToken),
     };
   }
 
@@ -137,13 +165,13 @@ export async function sendCapiEvent(payload: CapiEventPayload) {
     data: [eventData],
   };
 
-  const activeTestCode = payload.testEventCode || TEST_EVENT_CODE;
+  const activeTestCode = testCode;
   if (activeTestCode) {
     requestBody.test_event_code = activeTestCode;
   }
 
   try {
-    const url = `https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`;
+    const url = `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {

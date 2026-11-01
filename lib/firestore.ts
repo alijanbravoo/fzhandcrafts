@@ -321,6 +321,9 @@ export interface Settings {
   instagramLabel?: string;
   twitterUrl?: string;
   twitterLabel?: string;
+  metaPixelId?: string;
+  metaCapiAccessToken?: string;
+  metaTestEventCode?: string;
 }
 
 export const getSettings = async (): Promise<Settings> => {

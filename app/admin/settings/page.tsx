@@ -40,6 +40,9 @@ export default function SettingsPage() {
     instagramLabel: '',
     twitterUrl: '',
     twitterLabel: '',
+    metaPixelId: '',
+    metaCapiAccessToken: '',
+    metaTestEventCode: '',
   });
 
   useEffect(() => {
@@ -67,6 +70,9 @@ export default function SettingsPage() {
         instagramLabel: settings.instagramLabel || '',
         twitterUrl: settings.twitterUrl || '',
         twitterLabel: settings.twitterLabel || '',
+        metaPixelId: settings.metaPixelId || '1145868156876626',
+        metaCapiAccessToken: settings.metaCapiAccessToken || '',
+        metaTestEventCode: settings.metaTestEventCode || '',
       });
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -159,6 +165,9 @@ export default function SettingsPage() {
         instagramLabel: formData.instagramLabel.trim() || undefined,
         twitterUrl: formData.twitterUrl.trim() || undefined,
         twitterLabel: formData.twitterLabel.trim() || undefined,
+        metaPixelId: formData.metaPixelId.trim() || undefined,
+        metaCapiAccessToken: formData.metaCapiAccessToken.trim() || undefined,
+        metaTestEventCode: formData.metaTestEventCode.trim() || undefined,
       });
 
       toast.success('Settings updated successfully!');
@@ -472,6 +481,67 @@ export default function SettingsPage() {
                     placeholder="FZhandcrafts X"
                     className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-black bg-white text-black"
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Meta Pixel & Conversions API Settings */}
+            <div className="border-t pt-6">
+              <div className="flex items-center gap-2 mb-2">
+                <FiShield className="w-5 h-5 text-primary-600" />
+                <h2 className="text-lg font-bold text-gray-900">Meta Pixel &amp; Conversions API (CAPI)</h2>
+              </div>
+              <p className="text-xs text-gray-500 mb-4">
+                Configure your Meta credentials to stream Server-side Conversions API events directly to Facebook Events Manager for 100% event deduplication.
+              </p>
+
+              <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <div>
+                  <label htmlFor="metaPixelId" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                    Meta Pixel / Dataset ID
+                  </label>
+                  <input
+                    type="text"
+                    id="metaPixelId"
+                    value={formData.metaPixelId}
+                    onChange={(e) => setFormData({ ...formData, metaPixelId: e.target.value })}
+                    placeholder="1145868156876626"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="metaCapiAccessToken" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                    Meta Conversions API Access Token
+                  </label>
+                  <input
+                    type="password"
+                    id="metaCapiAccessToken"
+                    value={formData.metaCapiAccessToken}
+                    onChange={(e) => setFormData({ ...formData, metaCapiAccessToken: e.target.value })}
+                    placeholder="EAAG... (Generate in Meta Events Manager > Settings > Conversions API)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-mono"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    Generate this in <strong>Meta Events Manager</strong> ➔ Click Pixel ➔ <strong>Settings</strong> ➔ <em>Generate access token</em>. Paste it here to enable server events!
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="metaTestEventCode" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                    Meta Test Event Code (Optional - for live testing in Test Events tab)
+                  </label>
+                  <input
+                    type="text"
+                    id="metaTestEventCode"
+                    value={formData.metaTestEventCode}
+                    onChange={(e) => setFormData({ ...formData, metaTestEventCode: e.target.value })}
+                    placeholder="e.g. TEST12345 (Found on the Test Events tab)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-mono"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">
+                    When testing in Events Manager, paste the code shown in the <em>Test Events</em> tab here. Clear it when done testing.
+                  </p>
                 </div>
               </div>
             </div>
