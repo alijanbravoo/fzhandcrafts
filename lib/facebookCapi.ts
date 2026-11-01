@@ -42,6 +42,7 @@ export function formatPhoneForMeta(phone?: string): string | undefined {
 export interface CapiEventPayload {
   eventName: string;
   eventId: string; // Crucial for deduplication with browser pixel
+  testEventCode?: string; // Optional code for Meta Test Events tab
   sourceUrl?: string;
   clientIp?: string;
   userAgent?: string;
@@ -136,8 +137,9 @@ export async function sendCapiEvent(payload: CapiEventPayload) {
     data: [eventData],
   };
 
-  if (TEST_EVENT_CODE) {
-    requestBody.test_event_code = TEST_EVENT_CODE;
+  const activeTestCode = payload.testEventCode || TEST_EVENT_CODE;
+  if (activeTestCode) {
+    requestBody.test_event_code = activeTestCode;
   }
 
   try {
@@ -151,6 +153,9 @@ export async function sendCapiEvent(payload: CapiEventPayload) {
     });
 
     const result = await response.json();
+    if (!response.ok) {
+      console.error('[Meta CAPI Graph API Error]:', JSON.stringify(result));
+    }
     return {
       success: response.ok,
       result,

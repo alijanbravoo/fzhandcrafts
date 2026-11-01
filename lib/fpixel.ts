@@ -36,6 +36,24 @@ export function getFbc(): string | undefined {
   return undefined;
 }
 
+/**
+ * Get test_event_code dynamically from URL or sessionStorage for live testing in Events Manager
+ */
+export function getTestEventCode(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const codeFromUrl = params.get('test_event_code');
+    if (codeFromUrl) {
+      sessionStorage.setItem('meta_test_event_code', codeFromUrl);
+      return codeFromUrl;
+    }
+    return sessionStorage.getItem('meta_test_event_code') || undefined;
+  } catch (e) {
+    return undefined;
+  }
+}
+
 // Track PageView in browser
 export const pageview = () => {
   if (typeof window !== 'undefined' && (window as any).fbq && FB_PIXEL_ID) {
@@ -89,20 +107,23 @@ export async function trackHybridEvent({
     console.warn('[Pixel] Error tracking client event:', err);
   }
 
-  // 2. Extract _fbp and _fbc cookies from browser for server deduplication
+  // 2. Extract _fbp, _fbc cookies and test_event_code for server deduplication & testing
   const fbp = userData.fbp || getCookie('_fbp');
   const fbc = userData.fbc || getFbc();
+  const testEventCode = getTestEventCode();
 
-  // 3. Server CAPI Track
+  // 3. Server CAPI Track (with keepalive to prevent browser navigation from aborting the request)
   try {
     const res = await fetch('/api/fb-events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      keepalive: true,
       body: JSON.stringify({
         eventName,
         eventId,
+        testEventCode,
         userData: {
           ...userData,
           fbp,

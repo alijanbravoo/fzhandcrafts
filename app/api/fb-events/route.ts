@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
     const result = await sendCapiEvent({
       eventName: body.eventName,
       eventId: body.eventId,
+      testEventCode: body.testEventCode,
       sourceUrl: body.sourceUrl || referer,
       clientIp,
       userAgent,
@@ -45,4 +46,28 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Diagnostic GET endpoint to verify Meta CAPI credentials and configuration
+ */
+export async function GET() {
+  const pixelId =
+    process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID ||
+    process.env.NEXT_PUBLIC_META_PIXEL_ID ||
+    '';
+  const hasToken = Boolean(process.env.FACEBOOK_CAPI_ACCESS_TOKEN);
+  const testEventCode = process.env.FACEBOOK_TEST_EVENT_CODE || '';
+
+  return NextResponse.json({
+    status: 'ok',
+    configured: Boolean(pixelId && hasToken),
+    pixelIdConfigured: Boolean(pixelId),
+    pixelIdMasked: pixelId ? `${pixelId.slice(0, 4)}...${pixelId.slice(-4)}` : null,
+    accessTokenConfigured: hasToken,
+    testEventCodeConfigured: Boolean(testEventCode),
+    diagnostic: hasToken
+      ? 'Meta Conversions API is configured and ready to send server events.'
+      : 'ACTION REQUIRED: FACEBOOK_CAPI_ACCESS_TOKEN is missing in Vercel environment variables. Server events cannot be sent until this token is added.',
+  });
 }
