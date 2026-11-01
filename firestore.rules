@@ -2,11 +2,18 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // Safely check if the request contains an authenticated user with an email
+    function hasEmail() {
+      return request.auth != null && 
+        'email' in request.auth.token && 
+        request.auth.token.email != null;
+    }
+
     // Check if the signed-in user is an authorized admin
     // 1. Permanent Super Admin: alijanbravo@gmail.com
-    // 2. Or email exists in the /admins collection with isActive == true
+    // 2. Or email exists in the /admins collection with isActive != false
     function isAdmin() {
-      return request.auth != null && (
+      return hasEmail() && (
         request.auth.token.email.lower() == 'alijanbravo@gmail.com' ||
         (exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())) &&
          get(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())).data.isActive != false)
@@ -14,7 +21,7 @@ service cloud.firestore {
     }
 
     // Admins Collection:
-    // Only authenticated users can read (to check admin status), only admins can manage
+    // Any authenticated user can read (to verify their own or team admin status)
     match /admins/{adminEmail} {
       allow read: if request.auth != null;
       // Super admin can never be modified or deleted by anyone
@@ -28,7 +35,7 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Orders: anyone can create (for guest checkout), only authorized admins can update status or call logs
+    // Orders: anyone can create and read orders, only authorized admins can update status or call logs
     match /orders/{orderId} {
       allow read: if true;
       allow create: if true;

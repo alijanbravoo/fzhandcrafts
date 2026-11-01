@@ -94,6 +94,26 @@ export const logout = async (): Promise<void> => {
 // Permanent Super Admin that cannot be removed by anyone
 export const SUPER_ADMIN_EMAIL = 'alijanbravo@gmail.com'.toLowerCase();
 
+/**
+ * Returns all configured super admin emails from code and environment variables
+ */
+export const getConfiguredAdminEmails = (): string[] => {
+  const emails = [SUPER_ADMIN_EMAIL];
+  const envEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS;
+  if (envEmails) {
+    envEmails
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e && e.includes('@'))
+      .forEach((e) => {
+        if (!emails.includes(e)) {
+          emails.push(e);
+        }
+      });
+  }
+  return emails;
+};
+
 export interface AdminUserRecord {
   email: string;
   role: 'super_admin' | 'admin';
@@ -104,7 +124,7 @@ export interface AdminUserRecord {
 
 /**
  * Check if a given user object or email has authorized admin privileges.
- * 1. Checks if the email matches the permanent Super Admin (alijanbravo@gmail.com).
+ * 1. Checks if the email matches the permanent Super Admin or NEXT_PUBLIC_ADMIN_EMAILS.
  * 2. If not, checks the Firestore `admins` collection for an active admin entry.
  */
 export const checkIsAdmin = async (userOrEmail: User | string | null | undefined): Promise<boolean> => {
@@ -116,8 +136,9 @@ export const checkIsAdmin = async (userOrEmail: User | string | null | undefined
 
   if (!email) return false;
 
-  // 1. Permanent Super Admin is always authorized
-  if (email === SUPER_ADMIN_EMAIL) {
+  // 1. Permanent Super Admin or configured environment admin emails
+  const approvedEmails = getConfiguredAdminEmails();
+  if (approvedEmails.includes(email)) {
     return true;
   }
 
@@ -133,7 +154,7 @@ export const checkIsAdmin = async (userOrEmail: User | string | null | undefined
       return data.isActive !== false;
     }
   } catch (err) {
-    console.error('Error verifying admin status:', err);
+    console.error('Error verifying admin status from Firestore:', err);
   }
 
   return false;

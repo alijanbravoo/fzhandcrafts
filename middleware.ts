@@ -7,15 +7,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const expected = process.env.ADMIN_ACCESS_KEY;
+
+  // If no secret key is configured in environment, allow direct access to admin login
+  if (!expected || !expected.trim()) {
+    return NextResponse.next();
+  }
+
   const cookie = request.cookies.get('fz_admin_access')?.value;
   if (cookie === '1') {
     return NextResponse.next();
   }
 
   const key = searchParams.get('key');
-  const expected = process.env.ADMIN_ACCESS_KEY;
-
-  if (expected && key && key === expected) {
+  if (key && key === expected.trim()) {
     const url = request.nextUrl.clone();
     url.searchParams.delete('key');
 
