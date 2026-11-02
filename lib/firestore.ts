@@ -53,6 +53,8 @@ export interface Order {
   confirmationCallStatus?: 'pending' | 'picked_confirmed' | 'picked_cancelled' | 'not_picked' | 'hung_up' | string;
   specialRequest?: string;
   preferredCallTime?: string;
+  courierTrackingNumber?: string;
+  courierName?: string;
   userId?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -220,6 +222,12 @@ export const createOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'updat
   if (order.cancellationReason) {
     cleanOrder.cancellationReason = order.cancellationReason;
   }
+  if (order.courierTrackingNumber) {
+    cleanOrder.courierTrackingNumber = order.courierTrackingNumber.trim();
+  }
+  if (order.courierName) {
+    cleanOrder.courierName = order.courierName.trim();
+  }
 
   try {
     await setDoc(docRef, cleanOrder);
@@ -277,6 +285,23 @@ export const updateOrderCallStatus = async (
     confirmationCallStatus,
     updatedAt: Timestamp.now(),
   });
+};
+
+
+export const updateOrderTracking = async (
+  id: string, 
+  courierTrackingNumber: string,
+  courierName?: string
+): Promise<void> => {
+  const docRef = doc(db, 'orders', id);
+  const updateData: Record<string, any> = {
+    courierTrackingNumber: courierTrackingNumber.trim(),
+    updatedAt: Timestamp.now(),
+  };
+  if (courierName !== undefined) {
+    updateData.courierName = courierName.trim();
+  }
+  await updateDoc(docRef, updateData);
 };
 
 export const getNextOrderNumber = async (): Promise<string> => {

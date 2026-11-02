@@ -168,7 +168,14 @@ export default function CustomerAccountPage() {
                     <span className="text-xl font-black text-gray-900">#{order.orderNumber}</span>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {order.courierTrackingNumber && (
+                      <span className="text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <FiTruck className="w-3.5 h-3.5" />
+                        {order.courierName ? `${order.courierName}: ` : 'Tracking: '}
+                        <span className="font-mono">${order.courierTrackingNumber}</span>
+                      </span>
+                    )}
                     <span
                       className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider border ${getStatusColor(
                         order.status

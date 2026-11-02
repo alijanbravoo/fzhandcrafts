@@ -1,12 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FiFacebook, FiInstagram, FiTwitter, FiMail, FiPhone } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { getSettings } from '@/lib/firestore';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Footer() {
+  const pathname = usePathname();
+  const { user } = useAuth();
   const [contactEmail, setContactEmail] = useState('info@fzhandcrafts.com');
   const [contactPhone, setContactPhone] = useState('+92 300 1234567');
   const [facebookUrl, setFacebookUrl] = useState<string>('');
@@ -34,6 +38,11 @@ export default function Footer() {
     load();
   }, []);
 
+  // Do not show storefront customer footer on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <footer className="bg-[#4e1220] text-[#fbf9f6] border-t border-[#ffdead]/20 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
@@ -46,7 +55,7 @@ export default function Footer() {
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#ffdead]"></span>
             </Link>
-            <p className="text-xs text-[#fbf9f6]/80 leading-relaxed font-light">
+            <p className="text-xs text-[#fbf9f6]/80 leading-relaxed font-sans">
               Artisan handcrafted artificial velvet gajray, luxury floral jewelry, and festive chignon adornments. Stays fresh forever.
             </p>
             <div className="pt-2 flex items-center gap-2 text-xs text-[#ffdead]">
@@ -74,7 +83,12 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-xs text-[#fbf9f6]/80">
               <li><Link href="/contact" className="hover:text-[#ffdead] transition-colors">Contact Atelier</Link></li>
-              <li><Link href="/order-status" className="hover:text-[#ffdead] transition-colors">Live Order Tracker</Link></li>
+              {/* If user is logged in, route to my order and account page; otherwise to track order page */}
+              <li>
+                <Link href={user ? '/account' : '/order-status'} className="hover:text-[#ffdead] transition-colors">
+                  {user ? 'My Orders & Account' : 'Live Order Tracker'}
+                </Link>
+              </li>
               <li><Link href="/cart" className="hover:text-[#ffdead] transition-colors">Shopping Bag</Link></li>
               <li>
                 <a

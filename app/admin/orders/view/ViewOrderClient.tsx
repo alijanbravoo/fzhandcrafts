@@ -7,10 +7,10 @@ import toast from 'react-hot-toast';
 
 import AdminProtected from '@/components/AdminProtected';
 import AdminSidebar from '@/components/AdminSidebar';
-import { getOrderByNumber, updateOrderStatus, updateOrderCallStatus } from '@/lib/firestore';
+import { getOrderByNumber, updateOrderStatus, updateOrderCallStatus, updateOrderTracking } from '@/lib/firestore';
 import type { Order } from '@/lib/firestore';
 import { formatCurrency, formatPakistaniPhone, cleanPhoneNumber, normalizeImageUrl } from '@/lib/utils';
-import { FiCopy, FiCheck, FiPhone, FiCalendar, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiPhone, FiCalendar, FiClock, FiAlertCircle, FiTruck } from 'react-icons/fi';
 
 export default function ViewOrderClient() {
   const router = useRouter();
@@ -26,6 +26,11 @@ export default function ViewOrderClient() {
   const [showCancelPrompt, setShowCancelPrompt] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Courier Tracking state
+  const [courierNameInput, setCourierNameInput] = useState('Trax');
+  const [trackingNumberInput, setTrackingNumberInput] = useState('');
+  const [savingTracking, setSavingTracking] = useState(false);
+
   useEffect(() => {
     const load = async () => {
       if (!orderNumber) {
@@ -40,6 +45,12 @@ export default function ViewOrderClient() {
         setOrder(data);
         if (data?.cancellationReason) {
           setCancellationReasonInput(data.cancellationReason);
+        }
+        if (data?.courierName) {
+          setCourierNameInput(data.courierName);
+        }
+        if (data?.courierTrackingNumber) {
+          setTrackingNumberInput(data.courierTrackingNumber);
         }
         if (!data) {
           toast.error('Order not found');
@@ -108,6 +119,24 @@ export default function ViewOrderClient() {
     }
   };
 
+  const handleSaveTracking = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!orderNumber) return;
+    setSavingTracking(true);
+    try {
+      const courier = courierNameInput.trim() || 'Trax';
+      const tracking = trackingNumberInput.trim();
+      await updateOrderTracking(orderNumber, tracking, courier);
+      setOrder((prev) => (prev ? { ...prev, courierName: courier, courierTrackingNumber: tracking } : prev));
+      toast.success('Courier tracking number saved successfully!');
+    } catch (err) {
+      console.error('Error updating courier tracking:', err);
+      toast.error('Failed to save courier tracking number');
+    } finally {
+      setSavingTracking(false);
+    }
+  };
+
   const copyCustomerDetails = () => {
     if (!order) return;
     const slip = `Order #${order.orderNumber}\nCustomer: ${order.customerName}\nPhone: ${formatPakistaniPhone(order.customerPhone)}\nAddress: ${order.customerAddress}\nTotal: ${formatCurrency(order.total)}`;
@@ -122,7 +151,7 @@ export default function ViewOrderClient() {
       <div className="min-h-screen bg-gray-50 flex w-full max-w-full overflow-x-hidden">
         <AdminSidebar />
         <div className="flex-1 lg:ml-64 w-full max-w-full min-w-0 overflow-x-hidden">
-          <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-16 lg:pt-8">
+          <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-20 lg:pt-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 break-words">Order #{orderNumber}</h1>
               <div className="flex flex-wrap items-center gap-3">
@@ -144,7 +173,7 @@ export default function ViewOrderClient() {
 
             {loading ? (
               <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#013428]"></div>
               </div>
             ) : !order ? (
               <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">Order not found.</div>
@@ -173,6 +202,22 @@ export default function ViewOrderClient() {
                         <span className="text-xs font-bold uppercase text-gray-500 block mb-1">Delivery Address</span>
                         <p className="text-sm text-gray-800 leading-relaxed">{order.customerAddress}</p>
                       </div>
+
+                      {/* Special Request */}
+                      {order.specialRequest && (
+                        <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                          <span className="text-xs font-bold uppercase text-amber-800 block mb-1">Customer Special Request / Delivery Date</span>
+                          <p className="text-sm text-amber-900 font-medium">{order.specialRequest}</p>
+                        </div>
+                      )}
+
+                      {/* Preferred Call Time */}
+                      {order.preferredCallTime && (
+                        <div className="mt-2 text-xs text-gray-500 flex items-center gap-1.5">
+                          <FiClock className="w-3.5 h-3.5" />
+                          <span>Preferred confirmation call time: <strong className="text-gray-700 capitalize">{order.preferredCallTime}</strong></span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Order Controls */}
@@ -188,6 +233,7 @@ export default function ViewOrderClient() {
                           onChange={(e) => handleStatusChange(e.target.value as Order['status'])}
                           className="w-full px-3 py-2 border border-gray-300 rounded-xl bg-white text-sm font-semibold"
                         >
+                          <option value="pending">Pending</option>
                           <option value="processing">Processing</option>
                           <option value="confirmed">Confirmed</option>
                           <option value="shipped">Shipped</option>
@@ -213,6 +259,52 @@ export default function ViewOrderClient() {
                           <option value="not_picked">📞 Not picked</option>
                           <option value="hung_up">📴 Hung up</option>
                         </select>
+                      </div>
+
+                      {/* Courier Tracking Number Field */}
+                      <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-bold uppercase text-gray-700 flex items-center gap-1.5">
+                            <FiTruck className="w-4 h-4 text-[#013428]" />
+                            <span>Courier Tracking Number</span>
+                          </label>
+                          {order.courierTrackingNumber && (
+                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                              Active
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <select
+                            value={courierNameInput}
+                            onChange={(e) => setCourierNameInput(e.target.value)}
+                            className="px-3 py-2 border border-gray-300 rounded-xl bg-white text-xs font-semibold sm:w-1/3"
+                          >
+                            <option value="Trax">Trax</option>
+                            <option value="Leopards">Leopards</option>
+                            <option value="TCS">TCS</option>
+                            <option value="PostEx">PostEx</option>
+                            <option value="Call Courier">Call Courier</option>
+                            <option value="M&P">M&amp;P</option>
+                            <option value="Pakistan Post">Pak Post</option>
+                            <option value="Other">Other</option>
+                          </select>
+                          <input
+                            type="text"
+                            placeholder="Tracking Number (CN / AWB)"
+                            value={trackingNumberInput}
+                            onChange={(e) => setTrackingNumberInput(e.target.value)}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-xl bg-white text-xs font-mono font-medium focus:ring-2 focus:ring-[#013428] focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveTracking()}
+                          disabled={savingTracking}
+                          className="w-full py-2 px-3 bg-[#013428] hover:bg-[#1e4b3e] text-white text-xs font-semibold rounded-xl transition-all shadow-xs disabled:opacity-50"
+                        >
+                          {savingTracking ? 'Saving...' : 'Save Courier Tracking #'}
+                        </button>
                       </div>
 
                       {/* Cancellation Reason Display/Edit */}
@@ -241,51 +333,25 @@ export default function ViewOrderClient() {
                     </p>
                     <input
                       type="text"
+                      placeholder="e.g. Call not picked after 3 attempts, Out of stock..."
                       value={cancellationReasonInput}
                       onChange={(e) => setCancellationReasonInput(e.target.value)}
-                      placeholder="e.g. Call not picked after 3 attempts / Customer requested cancellation..."
-                      className="w-full px-4 py-2 border border-red-300 rounded-xl text-sm mb-3 bg-white"
+                      className="w-full px-3 py-2 border border-red-300 rounded-xl bg-white text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => setShowCancelPrompt(false)}
-                        className="px-4 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 bg-white"
-                      >
-                        Cancel
-                      </button>
+                    <div className="flex gap-2">
                       <button
                         onClick={handleConfirmCancelWithReason}
-                        className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold"
+                        disabled={savingStatus}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-xl shadow-sm"
                       >
-                        Save Cancellation Reason
+                        Confirm Cancellation
                       </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Special Request & Call Slot Card */}
-                {(order.specialRequest || order.preferredCallTime) && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-                    <h3 className="text-sm font-bold uppercase text-amber-900 tracking-wider mb-3">
-                      Customer Special Instructions
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {order.preferredCallTime && (
-                        <div>
-                          <span className="text-xs font-semibold text-amber-800 block">Preferred Call Time:</span>
-                          <span className="text-sm font-bold text-amber-950 mt-0.5 inline-block">
-                            ⏰ {order.preferredCallTime}
-                          </span>
-                        </div>
-                      )}
-                      {order.specialRequest && (
-                        <div>
-                          <span className="text-xs font-semibold text-amber-800 block">Special Request / Custom Note:</span>
-                          <p className="text-sm text-amber-950 mt-0.5 whitespace-pre-line">
-                            {order.specialRequest}
-                          </p>
-                        </div>
-                      )}
+                      <button
+                        onClick={() => setShowCancelPrompt(false)}
+                        className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-semibold text-xs rounded-xl hover:bg-gray-50"
+                      >
+                        Abort
+                      </button>
                     </div>
                   </div>
                 )}
@@ -321,7 +387,7 @@ export default function ViewOrderClient() {
 
                   <div className="border-t border-gray-200 mt-6 pt-4 flex items-center justify-between">
                     <span className="text-lg font-bold text-gray-900">Total Order Amount</span>
-                    <span className="text-2xl font-black text-primary-600">{formatCurrency(order.total)}</span>
+                    <span className="text-2xl font-black text-[#013428]">{formatCurrency(order.total)}</span>
                   </div>
                 </div>
               </div>

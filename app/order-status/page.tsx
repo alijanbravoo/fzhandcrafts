@@ -1,143 +1,181 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { getOrderByNumber } from '@/lib/firestore';
 import { Order } from '@/lib/firestore';
 import { formatCurrency, cleanPhoneNumber } from '@/lib/utils';
 import Image from 'next/image';
-import { FiCheckCircle, FiClock, FiPackage, FiTruck, FiXCircle, FiPhoneCall, FiLock, FiShield } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { 
+  FiCheckCircle, 
+  FiClock, 
+  FiPackage, 
+  FiTruck, 
+  FiXCircle, 
+  FiPhoneCall, 
+  FiShield, 
+  FiCopy, 
+  FiSearch,
+  FiPhone,
+  FiHash,
+  FiArrowRight,
+  FiAlertCircle
+} from 'react-icons/fi';
 import PWAInstallButton from '@/components/PWAInstallButton';
 
+// Strip all non-digits: match numbers only (ignoring spaces, dashes, parentheses)
+const digitsOnly = (val: string): string => (val || '').replace(/\D/g, '');
+
+const checkPhonesMatch = (inputPhone: string, orderPhone: string): boolean => {
+  const cleanInput = digitsOnly(inputPhone);
+  const cleanOrder = digitsOnly(orderPhone);
+  if (!cleanInput || !cleanOrder) return false;
+  if (cleanInput === cleanOrder) return true;
+  // Handle Pakistani country prefix variations (e.g., 923001234567 vs 03001234567)
+  return cleanInput.slice(-10) === cleanOrder.slice(-10);
+};
+
 function OrderStatusContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const orderNumber = searchParams.get('orderNumber');
-  const { user, phoneNumber, isPhoneUser } = useAuth();
+  const orderNumberParam = searchParams.get('orderNumber');
+  const { user, phoneNumber, loading: authLoading } = useAuth();
+
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchOrderNumber, setSearchOrderNumber] = useState(orderNumber || '');
-  const [savedOrderNumbers, setSavedOrderNumbers] = useState<string[]>([]);
   
-  // Security verification states
-  const [authRequired, setAuthRequired] = useState(false);
-  const [accessDenied, setAccessDenied] = useState(false);
-  const [guestPhoneVerificationNeeded, setGuestPhoneVerificationNeeded] = useState(false);
-  const [guestPhoneInput, setGuestPhoneInput] = useState('');
+  // Search inputs
+  const [searchOrderNumber, setSearchOrderNumber] = useState(orderNumberParam || '');
+  const [searchPhone, setSearchPhone] = useState('');
+  
+  // Verification states
   const [phoneVerified, setPhoneVerified] = useState(false);
+  const [needsPhoneVerification, setNeedsPhoneVerification] = useState(false);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [copiedTracking, setCopiedTracking] = useState(false);
 
+  // If a logged-in user visits the generic track order page, take them to My Orders & Account
   useEffect(() => {
-    if (orderNumber) {
-      loadOrder(orderNumber);
+    if (!authLoading && user && !orderNumberParam) {
+      router.replace('/account');
+    }
+  }, [user, authLoading, orderNumberParam, router]);
+
+  // Load order if orderNumberParam is in query
+  useEffect(() => {
+    if (orderNumberParam) {
+      loadOrder(orderNumberParam);
     } else {
       setLoading(false);
     }
-  }, [orderNumber, user]);
+  }, [orderNumberParam, user]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const savedOrders = JSON.parse(localStorage.getItem('fz_orders') || '[]') as Array<{ orderNumber?: string }>;
-      const unique = Array.from(
-        new Set(savedOrders.map((o) => String(o.orderNumber || '').trim()).filter(Boolean))
-      ).reverse();
-      setSavedOrderNumbers(unique);
-    } catch {
-      setSavedOrderNumbers([]);
-    }
-  }, []);
-
-  const verifyOrderAccess = (orderData: Order): boolean => {
-    // Reset security gates
-    setAuthRequired(false);
-    setAccessDenied(false);
-    setGuestPhoneVerificationNeeded(false);
-
-    const userPhoneClean = phoneNumber ? cleanPhoneNumber(phoneNumber) : '';
-    const orderPhoneClean = orderData.customerPhone ? cleanPhoneNumber(orderData.customerPhone) : '';
-    const userEmailClean = user?.email?.toLowerCase().trim() || '';
-    const orderEmailClean = orderData.customerEmail?.toLowerCase().trim() || '';
-
-    // Check if order was created by a registered user account
-    if (orderData.userId) {
-      if (!user) {
-        // Must be logged in to view an account order
-        setAuthRequired(true);
-        return false;
-      }
-
-      const isOwner =
-        orderData.userId === user.uid ||
-        (userEmailClean && userEmailClean === orderEmailClean) ||
-        (userPhoneClean && userPhoneClean === orderPhoneClean);
-
-      if (!isOwner) {
-        // Logged in as a different user
-        setAccessDenied(true);
-        return false;
-      }
-
-      return true;
+  const loadOrder = async (ordNum: string, phoneInputOverride?: string) => {
+    const cleanNum = ordNum.trim().replace(/^#/, '');
+    if (!cleanNum) {
+      toast.error('Please enter an order number');
+      setLoading(false);
+      return;
     }
 
-    // Guest Order: check if this browser placed the order
-    if (typeof window !== 'undefined') {
-      const savedOrders = JSON.parse(localStorage.getItem('fz_orders') || '[]') as Array<{ orderNumber?: string }>;
-      const isSavedInBrowser = savedOrders.some((o) => String(o.orderNumber).trim() === String(orderData.orderNumber).trim());
-      if (isSavedInBrowser) return true;
-    }
-
-    // If logged in customer matches guest order phone/email
-    if (user && ((userPhoneClean && userPhoneClean === orderPhoneClean) || (userEmailClean && userEmailClean === orderEmailClean))) {
-      return true;
-    }
-
-    // Otherwise, require phone verification
-    if (!phoneVerified) {
-      setGuestPhoneVerificationNeeded(true);
-      return false;
-    }
-
-    return true;
-  };
-
-  const loadOrder = async (ordNumber: string) => {
     setLoading(true);
+    setVerificationError(null);
+
     try {
-      const orderData = await getOrderByNumber(ordNumber);
-      if (orderData) {
-        const allowed = verifyOrderAccess(orderData);
-        setOrder(orderData);
-      } else {
+      const orderData = await getOrderByNumber(cleanNum);
+      if (!orderData) {
         setOrder(null);
+        setNeedsPhoneVerification(false);
+        setPhoneVerified(false);
+        toast.error(`Order #${cleanNum} not found. Please double-check your order number.`);
+        setLoading(false);
+        return;
+      }
+
+      setOrder(orderData);
+
+      // 1. If user is logged in: verify ownership
+      if (user) {
+        const userPhoneClean = phoneNumber ? digitsOnly(phoneNumber) : '';
+        const orderPhoneClean = digitsOnly(orderData.customerPhone);
+        const userEmailClean = user.email?.toLowerCase().trim() || '';
+        const orderEmailClean = orderData.customerEmail?.toLowerCase().trim() || '';
+
+        const isOwner =
+          orderData.userId === user.uid ||
+          (userEmailClean && userEmailClean === orderEmailClean) ||
+          (userPhoneClean && userPhoneClean.slice(-10) === orderPhoneClean.slice(-10));
+
+        if (isOwner) {
+          setPhoneVerified(true);
+          setNeedsPhoneVerification(false);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 2. Non-account / Guest user: require phone number match
+      const phoneToTest = phoneInputOverride || searchPhone;
+      if (phoneToTest.trim()) {
+        if (checkPhonesMatch(phoneToTest, orderData.customerPhone)) {
+          setPhoneVerified(true);
+          setNeedsPhoneVerification(false);
+        } else {
+          setPhoneVerified(false);
+          setNeedsPhoneVerification(true);
+          setVerificationError('Phone number does not match this order. Please enter the contact number used during checkout.');
+        }
+      } else {
+        // Need phone verification before showing order details
+        setPhoneVerified(false);
+        setNeedsPhoneVerification(true);
       }
     } catch (error) {
-      console.error('Error loading order:', error);
+      console.error('Error fetching order:', error);
+      toast.error('Failed to load order. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchOrderNumber.trim()) {
+      toast.error('Please enter an order number');
+      return;
+    }
+    loadOrder(searchOrderNumber, searchPhone);
+  };
+
   const handlePhoneVerifySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!order) return;
-    const inputClean = cleanPhoneNumber(guestPhoneInput);
-    const orderClean = cleanPhoneNumber(order.customerPhone);
 
-    if (inputClean && inputClean === orderClean) {
+    if (!searchPhone.trim()) {
+      toast.error('Please enter your contact phone number');
+      return;
+    }
+
+    if (checkPhonesMatch(searchPhone, order.customerPhone)) {
       setPhoneVerified(true);
-      setGuestPhoneVerificationNeeded(false);
+      setNeedsPhoneVerification(false);
+      setVerificationError(null);
+      toast.success('Identity verified! Showing order details.');
     } else {
-      alert('Phone number does not match this order. Please enter the phone number provided during checkout.');
+      setVerificationError('Phone number does not match this order. Please enter the contact number provided during checkout.');
+      toast.error('Phone number does not match order.');
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchOrderNumber) {
-      loadOrder(searchOrderNumber);
-    }
+  const copyTrackingNumber = () => {
+    if (!order?.courierTrackingNumber) return;
+    navigator.clipboard.writeText(order.courierTrackingNumber);
+    setCopiedTracking(true);
+    toast.success('Courier tracking number copied!');
+    setTimeout(() => setCopiedTracking(false), 2000);
   };
 
   const getStatusIcon = (status: Order['status']) => {
@@ -176,6 +214,7 @@ function OrderStatusContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
+      {/* Header Banner */}
       <div className="text-center max-w-xl mx-auto mb-8 sm:mb-12">
         <span className="text-xs uppercase tracking-widest text-[#6b1d30] font-bold">
           Live Status Verification
@@ -184,103 +223,134 @@ function OrderStatusContent() {
           Track Your Gajray Order
         </h1>
         <p className="text-xs sm:text-sm text-gray-500 mt-2">
-          Enter your order number below to check crafting, confirmation, and nationwide shipping status.
+          Enter your order number and phone number to verify and check live crafting, dispatch, and courier tracking details.
         </p>
+
+        {user && (
+          <div className="mt-4 inline-flex items-center gap-2 p-2 px-4 rounded-full bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+            <span>Signed in as <strong>{user.displayName || user.email}</strong>.</span>
+            <Link href="/account" className="underline font-bold hover:text-emerald-950">
+              View All My Orders →
+            </Link>
+          </div>
+        )}
       </div>
 
-      {!order && (
-        <div className="max-w-md mx-auto mb-10">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 bg-white p-2 rounded-2xl border border-[#eae8e5] shadow-xs">
-            <input
-              type="text"
-              placeholder="Order number (e.g., 1001)"
-              list="fz-saved-orders"
-              value={searchOrderNumber}
-              onChange={(e) => setSearchOrderNumber(e.target.value)}
-              className="flex-1 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#013428] bg-[#fbf9f6] text-gray-900 text-sm"
-            />
-            <datalist id="fz-saved-orders">
-              {savedOrderNumbers.map((n) => (
-                <option key={n} value={n} />
-              ))}
-            </datalist>
+      {/* Guest Search Form (Shown when no order is displayed or to search a different order) */}
+      {(!order || needsPhoneVerification) && (
+        <div className="max-w-lg mx-auto mb-10">
+          <form 
+            onSubmit={needsPhoneVerification && order ? handlePhoneVerifySubmit : handleSearchSubmit} 
+            className="bg-white p-6 sm:p-8 rounded-3xl border border-[#eae8e5] shadow-xs space-y-4"
+          >
+            <div className="text-center pb-2 border-b border-[#eae8e5]">
+              <div className="w-12 h-12 rounded-2xl bg-[#013428]/10 text-[#013428] flex items-center justify-center mx-auto mb-2 text-xl">
+                <FiShield />
+              </div>
+              <h2 className="font-serif text-lg font-bold text-[#013428]">
+                {needsPhoneVerification && order ? `Verify Phone for Order #${order.orderNumber}` : 'Look Up Your Order'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                For customer privacy, phone number verification is required.
+              </p>
+            </div>
+
+            {verificationError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium flex items-start gap-2">
+                <FiAlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <span>{verificationError}</span>
+              </div>
+            )}
+
+            {/* Order Number Field */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Order Number
+              </label>
+              <div className="relative">
+                <FiHash className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 1001"
+                  value={searchOrderNumber}
+                  onChange={(e) => setSearchOrderNumber(e.target.value)}
+                  disabled={!!(needsPhoneVerification && order)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#013428] bg-[#fbf9f6] text-gray-900 text-sm font-mono font-medium disabled:opacity-75 disabled:bg-gray-100"
+                />
+              </div>
+            </div>
+
+            {/* Phone Number Field */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Contact Phone Number (Used at Checkout)
+              </label>
+              <div className="relative">
+                <FiPhone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="tel"
+                  required
+                  placeholder="e.g. 0300-1234567 or 03001234567"
+                  value={searchPhone}
+                  onChange={(e) => setSearchPhone(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#013428] bg-[#fbf9f6] text-gray-900 text-sm font-mono"
+                />
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">
+                Spaces and dashes are automatically ignored. Only numbers are verified.
+              </p>
+            </div>
+
             <button
               type="submit"
-              className="bg-[#013428] hover:bg-[#1e4b3e] text-white px-7 py-3 rounded-xl font-semibold text-sm transition-all shadow-xs w-full sm:w-auto"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-[#013428] hover:bg-[#1e4b3e] text-white rounded-full font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              Search
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Verifying...</span>
+                </>
+              ) : (
+                <>
+                  <span>{needsPhoneVerification && order ? 'Verify Phone & View Order' : 'Track Order Status'}</span>
+                  <FiArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
+
+            {needsPhoneVerification && order && (
+              <button
+                type="button"
+                onClick={() => {
+                  setOrder(null);
+                  setNeedsPhoneVerification(false);
+                  setSearchOrderNumber('');
+                  setSearchPhone('');
+                  setVerificationError(null);
+                }}
+                className="w-full text-center text-xs text-gray-500 hover:text-gray-800 py-1"
+              >
+                ← Search a different order number
+              </button>
+            )}
           </form>
         </div>
       )}
 
-      {loading ? (
-        <div className="text-center py-16">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#013428]"></div>
-          <p className="text-xs text-gray-500 mt-3 font-medium">Looking up order records...</p>
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-[#013428]"></div>
+          <p className="text-xs text-gray-500 mt-3 font-medium">Looking up order details...</p>
         </div>
-      ) : order && authRequired ? (
-        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xs border border-[#eae8e5] p-8 text-center space-y-4">
-          <div className="w-14 h-14 bg-[#ffdead] text-[#4e1220] rounded-full flex items-center justify-center mx-auto text-xl">
-            <FiLock />
-          </div>
-          <h2 className="font-serif text-2xl font-bold text-[#013428]">Account Sign-In Required</h2>
-          <p className="text-xs text-gray-600 leading-relaxed">
-            Order #{order.orderNumber} is linked to a registered customer account. Sign in to view order details.
-          </p>
-          <Link
-            href={`/login`}
-            className="inline-block w-full py-3 px-4 bg-[#013428] hover:bg-[#1e4b3e] text-white font-bold rounded-full shadow-xs transition-colors text-sm"
-          >
-            Sign In to View Order
-          </Link>
-        </div>
-      ) : order && accessDenied ? (
-        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xs border border-red-200 p-8 text-center space-y-4">
-          <div className="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-xl">
-            <FiShield />
-          </div>
-          <h2 className="font-serif text-2xl font-bold text-gray-900">Access Restricted</h2>
-          <p className="text-xs text-gray-600 leading-relaxed">
-            This order does not belong to your account. Customers can only view orders placed under their own account.
-          </p>
-          <Link
-            href="/account"
-            className="inline-block w-full py-3 px-4 bg-[#013428] hover:bg-[#1e4b3e] text-white font-bold rounded-full shadow-xs transition-colors text-sm"
-          >
-            Go to My Orders
-          </Link>
-        </div>
-      ) : order && guestPhoneVerificationNeeded ? (
-        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-xs border border-[#eae8e5] p-8 space-y-5">
-          <div className="w-14 h-14 bg-[#013428]/10 text-[#013428] rounded-full flex items-center justify-center mx-auto text-xl">
-            <FiShield />
-          </div>
-          <div className="text-center">
-            <h2 className="font-serif text-2xl font-bold text-[#013428]">Customer Verification</h2>
-            <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-              Please enter the 11-digit phone number used for Order #{order.orderNumber} to unlock delivery details.
-            </p>
-          </div>
-          <form onSubmit={handlePhoneVerifySubmit} className="space-y-4">
-            <input
-              type="tel"
-              required
-              placeholder="e.g. 03001234567"
-              value={guestPhoneInput}
-              onChange={(e) => setGuestPhoneInput(e.target.value)}
-              className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] bg-[#fbf9f6] text-gray-900 text-sm"
-            />
-            <button
-              type="submit"
-              className="w-full py-3.5 bg-[#013428] hover:bg-[#1e4b3e] text-white font-bold rounded-full transition-all shadow-xs text-sm"
-            >
-              Verify &amp; View Order
-            </button>
-          </form>
-        </div>
-      ) : order ? (
+      )}
+
+      {/* Verified Order Details (Only visible when phoneVerified === true) */}
+      {!loading && order && phoneVerified && (
         <div className="max-w-4xl mx-auto space-y-6">
+          {/* Order Header Card */}
           <div className="bg-white rounded-3xl shadow-xs border border-[#eae8e5] p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 pb-6 border-b border-[#eae8e5]">
               <div>
@@ -291,7 +361,7 @@ function OrderStatusContent() {
                   Order #{order.orderNumber}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  Placed on {order.createdAt.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                  Placed on {order.createdAt?.toDate ? order.createdAt.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recent'}
                 </p>
               </div>
               <div className={`px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${getStatusColor(order.status)} w-fit`}>
@@ -299,6 +369,36 @@ function OrderStatusContent() {
                 <span>{order.status}</span>
               </div>
             </div>
+
+            {/* Courier Tracking Banner (Adjustment 4) */}
+            {order.courierTrackingNumber && (
+              <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-purple-50 via-purple-50/60 to-purple-50 border border-purple-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-purple-700 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <FiTruck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-purple-700 block">
+                      Courier Dispatch Tracking
+                    </span>
+                    <p className="text-base font-bold text-purple-950 font-mono mt-0.5">
+                      {order.courierName ? `${order.courierName}: ` : ''}{order.courierTrackingNumber}
+                    </p>
+                    <p className="text-[11px] text-purple-800 mt-0.5">
+                      Your parcel has been booked for nationwide express delivery.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={copyTrackingNumber}
+                  className="px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-full text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0"
+                >
+                  <FiCopy className="w-3.5 h-3.5" />
+                  <span>{copiedTracking ? 'Copied Tracking #' : 'Copy Tracking #'}</span>
+                </button>
+              </div>
+            )}
 
             {/* Order Confirmation Call Reminder */}
             {order.status === 'processing' && (
@@ -310,7 +410,7 @@ function OrderStatusContent() {
                   <div>
                     <h4 className="text-sm font-bold text-[#002018]">Order Confirmation in Progress</h4>
                     <p className="text-xs sm:text-sm text-[#013428] mt-0.5">
-                      Kindly keep your phone active ({order.customerPhone}), our atelier team will call to confirm your delivery details.
+                      Kindly keep your phone active ({order.customerPhone}), our team will call to confirm your delivery address.
                     </p>
                     {order.preferredCallTime && (
                       <p className="text-xs text-[#1e6b47] font-semibold mt-1">
@@ -322,7 +422,7 @@ function OrderStatusContent() {
               </div>
             )}
 
-            {/* Cancellation Reason Alert for Customer */}
+            {/* Cancellation Reason Alert */}
             {order.status === 'cancelled' && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
                 <div className="flex items-start gap-3">
@@ -337,12 +437,13 @@ function OrderStatusContent() {
               </div>
             )}
 
+            {/* Ordered Items List */}
             <div>
               <h3 className="font-serif text-lg font-bold text-[#013428] mb-4">Ordered Floral Pieces</h3>
               <div className="space-y-3">
                 {order.items.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-3 rounded-2xl bg-[#fbf9f6] border border-[#eae8e5]">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
                         <Image
                           src={item.image || 'https://via.placeholder.com/100x100?text=Flower'}
@@ -351,14 +452,14 @@ function OrderStatusContent() {
                           className="object-cover"
                         />
                       </div>
-                      <div>
-                        <h4 className="font-serif font-bold text-sm text-[#013428]">{item.productName}</h4>
+                      <div className="min-w-0">
+                        <h4 className="font-serif font-bold text-sm text-[#013428] truncate">{item.productName}</h4>
                         <p className="text-xs text-gray-500">
                           Qty: {item.quantity} × {formatCurrency(item.price)}
                         </p>
                       </div>
                     </div>
-                    <p className="font-serif font-bold text-sm text-[#013428]">
+                    <p className="font-serif font-bold text-sm text-[#013428] shrink-0">
                       {formatCurrency(item.price * item.quantity)}
                     </p>
                   </div>
@@ -366,6 +467,7 @@ function OrderStatusContent() {
               </div>
             </div>
 
+            {/* Total Payable */}
             <div className="border-t border-[#eae8e5] pt-5 mt-6 flex justify-between items-baseline">
               <span className="font-serif text-lg font-bold text-gray-900">Total Payable (COD)</span>
               <span className="font-serif text-2xl sm:text-3xl font-bold text-[#013428]">
@@ -374,6 +476,7 @@ function OrderStatusContent() {
             </div>
           </div>
 
+          {/* Delivery Information Card */}
           <div className="bg-white rounded-3xl shadow-xs border border-[#eae8e5] p-6 sm:p-8 space-y-4">
             <h3 className="font-serif text-lg font-bold text-[#013428] border-b border-[#eae8e5] pb-3">
               Delivery Information
@@ -392,7 +495,7 @@ function OrderStatusContent() {
                 {order.preferredCallTime && (
                   <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs">
                     <span className="font-bold text-blue-900 block">📞 Preferred Call Time:</span>
-                    <span className="text-blue-800">{order.preferredCallTime}</span>
+                    <span className="text-blue-800 capitalize">{order.preferredCallTime}</span>
                   </div>
                 )}
                 {order.specialRequest && (
@@ -405,7 +508,23 @@ function OrderStatusContent() {
             </div>
           </div>
 
-          {/* PWA Install Button - Using Component */}
+          {/* Action Bar */}
+          <div className="flex justify-center pt-2">
+            <button
+              onClick={() => {
+                setOrder(null);
+                setPhoneVerified(false);
+                setNeedsPhoneVerification(false);
+                setSearchOrderNumber('');
+                setSearchPhone('');
+              }}
+              className="text-xs font-semibold text-[#013428] hover:underline"
+            >
+              ← Track Another Order
+            </button>
+          </div>
+
+          {/* PWA Install Button */}
           <PWAInstallButton
             variant="prominent"
             className="mt-6"
@@ -413,10 +532,6 @@ function OrderStatusContent() {
             description="Get faster access to order status updates on your phone."
             buttonText="Install App"
           />
-        </div>
-      ) : (
-        <div className="text-center py-12 text-gray-500">
-          <p>No order found. Please check your order number and try again.</p>
         </div>
       )}
     </div>
@@ -436,4 +551,3 @@ export default function OrderStatusPage() {
     </Suspense>
   );
 }
-

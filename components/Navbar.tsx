@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { FiShoppingCart, FiMenu, FiX, FiUser, FiPackage, FiLogOut } from 'react-icons/fi';
+import { FiShoppingCart, FiMenu, FiX, FiUser, FiPackage, FiLogOut, FiExternalLink, FiShield } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -18,6 +18,7 @@ export default function Navbar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const isAdminPage = pathname?.startsWith('/admin');
 
   useEffect(() => {
     setMounted(true);
@@ -27,7 +28,8 @@ export default function Navbar() {
     { href: '/', label: 'Home' },
     { href: '/products', label: 'All Gajray' },
     { href: '/categories', label: 'Collections' },
-    { href: '/order-status', label: 'Track Order' },
+    // If logged in, route to my orders and account page; otherwise to track order page
+    { href: user ? '/account' : '/order-status', label: 'Track Order' },
     { href: '/about', label: 'Our Story' },
     { href: '/contact', label: 'Contact' },
   ];
@@ -53,38 +55,60 @@ export default function Navbar() {
               FZhandcrafts
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#ffdead] shrink-0"></span>
+            {isAdminPage && (
+              <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#ffdead]/20 text-[#ffdead] border border-[#ffdead]/30 hidden xs:inline-flex items-center gap-1">
+                <FiShield className="w-3 h-3" /> Admin
+              </span>
+            )}
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex space-x-1 lg:space-x-2 shrink-0">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all ${
-                  pathname === link.href
-                    ? 'text-[#4e1220] bg-[#ffdead] shadow-xs'
-                    : 'text-[#fbf9f6]/90 hover:text-[#ffdead] hover:bg-white/10'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+          {/* Desktop Navigation Links (Customer only - hidden on Admin pages) */}
+          {!isAdminPage && (
+            <div className="hidden md:flex space-x-1 lg:space-x-2 shrink-0">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                    pathname === link.href
+                      ? 'text-[#4e1220] bg-[#ffdead] shadow-xs'
+                      : 'text-[#fbf9f6]/90 hover:text-[#ffdead] hover:bg-white/10'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
 
-          {/* Right Actions: WhatsApp + User Account + Cart */}
+          {/* Admin Header Quick Links (Only on Admin pages) */}
+          {isAdminPage && (
+            <div className="hidden sm:flex items-center gap-3 text-xs">
+              <Link
+                href="/"
+                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-[#ffdead] font-medium transition-all flex items-center gap-1.5"
+              >
+                <span>View Storefront</span>
+                <FiExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
+
+          {/* Right Actions */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            {/* WhatsApp Quick Chat */}
-            <a
-              href="https://wa.me/923001234567"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Chat on WhatsApp"
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all text-xs font-semibold"
-            >
-              <FaWhatsapp className="w-3.5 h-3.5" />
-              <span>WhatsApp</span>
-            </a>
+            {/* WhatsApp Quick Chat (Customer only) */}
+            {!isAdminPage && (
+              <a
+                href="https://wa.me/923001234567"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Chat on WhatsApp"
+                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all text-xs font-semibold"
+              >
+                <FaWhatsapp className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+              </a>
+            )}
 
             {/* User Account Menu (Desktop) */}
             <div className="relative hidden sm:block" ref={userMenuRef}>
@@ -110,13 +134,6 @@ export default function Navbar() {
                       >
                         <FiPackage className="w-3.5 h-3.5" /> My Orders &amp; Account
                       </Link>
-                      <Link
-                        href="/order-status"
-                        onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-[#6b1d30]/10 hover:text-[#6b1d30]"
-                      >
-                        <FiUser className="w-3.5 h-3.5" /> Track Order Status
-                      </Link>
                       <button
                         onClick={() => {
                           setIsUserMenuOpen(false);
@@ -129,7 +146,7 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : !isAdminPage ? (
                 <Link
                   href="/login"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#fbf9f6] hover:text-[#ffdead] hover:bg-white/10 transition-colors"
@@ -137,36 +154,51 @@ export default function Navbar() {
                   <FiUser className="w-3.5 h-3.5" />
                   <span>Sign In</span>
                 </Link>
-              )}
+              ) : null}
             </div>
 
-            {/* Shopping Cart Button */}
-            <Link
-              href="/cart"
-              className="relative p-2 text-[#fbf9f6] hover:text-[#ffdead] transition-colors rounded-full hover:bg-white/10 shrink-0"
-              aria-label="Shopping Cart"
-            >
-              <FiShoppingCart className="w-5 h-5" />
-              {mounted && cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#ffdead] text-[#4e1220] text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-sm">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
+            {/* Shopping Cart Button (Customer only) */}
+            {!isAdminPage && (
+              <Link
+                href="/cart"
+                className="relative p-2 text-[#fbf9f6] hover:text-[#ffdead] transition-colors rounded-full hover:bg-white/10 shrink-0"
+                aria-label="Shopping Cart"
+              >
+                <FiShoppingCart className="w-5 h-5" />
+                {mounted && cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#ffdead] text-[#4e1220] text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-sm">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
-            {/* Mobile menu toggle button */}
-            <button
-              className="md:hidden p-2 text-[#fbf9f6] hover:text-[#ffdead] rounded-lg shrink-0 flex items-center justify-center"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle Navigation Menu"
-            >
-              {isMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-            </button>
+            {/* Mobile menu toggle button (CUSTOMER ONLY - STRICTLY REMOVED FROM ADMIN PANEL) */}
+            {!isAdminPage && (
+              <button
+                className="md:hidden p-2 text-[#fbf9f6] hover:text-[#ffdead] rounded-lg shrink-0 flex items-center justify-center"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle Customer Navigation Menu"
+              >
+                {isMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+              </button>
+            )}
+
+            {/* Mobile View Storefront Link on Admin */}
+            {isAdminPage && (
+              <Link
+                href="/"
+                className="sm:hidden px-2.5 py-1 rounded-full bg-white/10 text-[#ffdead] text-[11px] font-semibold flex items-center gap-1"
+              >
+                <span>Store</span>
+                <FiExternalLink className="w-3 h-3" />
+              </Link>
+            )}
           </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {isMenuOpen && (
+        {/* Customer Mobile Navigation Drawer (CUSTOMER ONLY - NEVER SHOWN ON ADMIN) */}
+        {!isAdminPage && isMenuOpen && (
           <div className="md:hidden py-4 border-t border-white/10 space-y-1">
             {navLinks.map((link) => (
               <Link
@@ -191,7 +223,7 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                     className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-[#4e1220] bg-[#ffdead] mb-2"
                   >
-                    👤 My Account ({displayName})
+                    👤 My Orders &amp; Account ({displayName})
                   </Link>
                   <button
                     onClick={() => {
