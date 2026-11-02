@@ -177,3 +177,28 @@ try {
 
 
 
+
+
+## 📦 Admin & Order Tracking Adjustments (Latest)
+
+### 1. Dedicated Admin Shell & Clean Header Separation
+- Removed customer navigation links, cart button, and mobile hamburger drawer on all `/admin*` routes in `components/Navbar.tsx`.
+- Suppressed customer storefront footer on admin pages in `components/Footer.tsx`.
+- Adjusted the mobile admin sidebar trigger position from `top-4` to `top-[76px]` in `components/AdminSidebar.tsx` to completely prevent overlap with the sticky 64px header.
+- Added internal close button and backdrop click-to-dismiss for smooth touch navigation.
+
+### 2. Admin Dashboard Mobile Responsiveness
+- Redesigned the Recent Orders card view in `app/admin/page.tsx` using responsive constraints (`min-w-0`, `truncate`, `break-all`, and proper badge wrapping) to ensure cards scale cleanly without breaking horizontally on screens under 380px.
+- Adjusted page top padding to `pt-20 lg:pt-8` for proper spacing below navigation.
+
+### 3. Courier Tracking Number & Carrier Integration
+- Extended `Order` interface in `lib/firestore.ts` with `courierTrackingNumber?: string` and `courierName?: string`.
+- Created `updateOrderTracking(orderId, courierTrackingNumber, courierName)` in Firestore library.
+- Added a dedicated Courier Tracking card to `app/admin/orders/view/ViewOrderClient.tsx` with carrier dropdown (Trax, Leopards, TCS, PostEx, Call Courier, etc.) and save button.
+- Added courier tracking badges on admin orders table and customer account orders list (`app/account/page.tsx`).
+
+### 4. Smart Track Order Routing & Strict Phone Verification
+- Updated "Track Order" navigation link in `components/Navbar.tsx` and `components/Footer.tsx` to automatically route authenticated users to `/account` (My Orders & Account).
+- Protected guest order lookups on `app/order-status/page.tsx` by requiring both Order Number and Phone Number.
+- Phone matching strips all non-digits (`replace(/\D/g, '')`) and compares trailing 10 digits to handle Pakistani phone formatting (`+92`, `03XX`, dashes, spaces).
+- Order details remain hidden until the guest phone number matches the order record.

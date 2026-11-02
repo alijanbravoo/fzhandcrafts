@@ -22,7 +22,10 @@ A modern, full-featured e-commerce website for **FZhandcrafts** built with Next.
 - **Categories**: Browse products by category
 - **Shopping Cart**: Add, remove, update quantities, and order cart via WhatsApp
 - **Checkout**: Secure checkout with COD and guest account prompts
-- **Order Status**: Track orders using order number
+- **Order Status & Guest Tracking**:
+  - Logged-in customers clicking "Track Order" are routed directly to `/account` ("My Orders & Account")
+  - Guest/non-account lookups require entering the order number plus matching the checkout phone number (digits only, whitespace/dash insensitive) before sensitive order information is displayed
+  - Real-time courier tracking details (courier partner name, tracking / CN number, and one-click copy) displayed directly on verified order status and account pages
 - **About Us**: Information about the business
 - **Contact Us**: Contact form and business information
 
@@ -32,7 +35,10 @@ A modern, full-featured e-commerce website for **FZhandcrafts** built with Next.
   - **Permanent Super Admin**: `alijanbravo@gmail.com` (cannot be modified or removed by anyone)
   - **Multi-Admin Management**: Super admin can authorize/revoke additional admin team Gmail accounts from `/admin/settings`
   - Route guards (`AdminProtected`) and Firestore security rules block unauthorized customers and arbitrary accounts
-- **Admin Dashboard**: Overview of orders, revenue, and statistics with responsive text/card scaling
+- **Admin Dashboard & Navigation**:
+  - Overview of orders, revenue, and statistics with responsive text/card scaling and mobile-first card view
+  - Clean separation of customer storefront navigation and admin navigation (customer menu/cart removed on /admin pages)
+  - Dedicated admin navigation toggle with collision-free top spacing below sticky header
 - **Product Management**:
   - Add, edit, and delete products
   - Upload/manage multiple image URLs (including automatic Google Drive link conversion)
@@ -40,6 +46,7 @@ A modern, full-featured e-commerce website for **FZhandcrafts** built with Next.
   - Configurable bundle discount percentages (Tier 2 and Tier 3)
   - Customizable product specifications (Bloom Material, Glitter Flower, Weight & Diameter, Fastener)
 - **Order Management**:
+  - Courier dispatch tracking: Assign courier partner (Trax, Leopards, TCS, PostEx, Call Courier, etc.) and tracking/AWB number directly from order view
   - Confirmation call logging (Pending, Picked & Confirmed, Picked & Cancelled, Not Picked, Hung Up)
   - Cancellation reason capture (preset reasons + custom explanation)
   - Date range filters and search by order #, phone, or customer name
