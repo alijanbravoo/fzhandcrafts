@@ -160,7 +160,7 @@ export default function ProductClient() {
   }, [product, selectedBundleTier, quantity, currentTotalPrice]);
 
   // Cart / Order actions
-  const handleAddToCart = () => {
+  const handleAddToCart = (notify = false) => {
     if (product) {
       const bundleLabel = selectedBundleTier === 1 ? '' : ` (${selectedBundleTier} Pairs Bundle)`;
       addToCart({
@@ -190,12 +190,14 @@ export default function ProductClient() {
         },
       });
 
-      toast.success('Added to cart!');
+      if (notify) {
+        toast.success('Added to cart!');
+      }
     }
   };
 
   const handleOrderNow = () => {
-    handleAddToCart();
+    handleAddToCart(false);
     router.push('/checkout');
   };
 
@@ -602,16 +604,6 @@ export default function ProductClient() {
                   <span>Order via WhatsApp</span>
                 </button>
               </div>
-
-              {/* Add to Cart Button */}
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="w-full h-12 rounded-full border-2 border-[#013428] text-[#013428] hover:bg-[#013428]/5 font-semibold text-sm transition-colors flex items-center justify-center gap-2"
-              >
-                <FiShoppingCart className="w-5 h-5" />
-                <span>Add to Cart</span>
-              </button>
             </div>
 
             {/* Accordions Section on Mobile (only shown on mobile below action buttons, hidden on lg screens where they appear on bottom) */}
