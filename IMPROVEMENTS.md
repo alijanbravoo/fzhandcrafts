@@ -202,3 +202,26 @@ try {
 - Protected guest order lookups on `app/order-status/page.tsx` by requiring both Order Number and Phone Number.
 - Phone matching strips all non-digits (`replace(/\D/g, '')`) and compares trailing 10 digits to handle Pakistani phone formatting (`+92`, `03XX`, dashes, spaces).
 - Order details remain hidden until the guest phone number matches the order record.
+
+## 🎯 Meta Pixel & Conversions API (CAPI) Hybrid Setup & Verification
+
+### Problem Encountered
+1. **Warning in Meta Events Manager**: "Improve your rate of Meta Pixel events covered by Conversions API... Your server is sending fewer events than pixel."
+2. **Missing Server Events in Test Events Tool**: When browsing or placing orders, Meta Events Manager only registered "Browser" events.
+3. **Mismatched / Stale Test Code**: A stale test code (`TEST46377`) in Firestore settings was causing Meta to reject/suppress server events from live streams with error: `test_event_code does not match an active Test Events session`.
+
+### Solution & Root Cause Resolution
+1. **Deduplication Alignment**:
+   - Implemented `trackHybridEvent` across key user interactions (`ViewContent`, `AddToCart`, `InitiateCheckout`, `Purchase`).
+   - Unified `eventId` generation across both browser pixel (`fbq('track', name, options, { eventID })`) and server CAPI (`data[0].event_id`), allowing Meta to merge browser and server events into a single deduplicated conversion.
+2. **First-Party Cookie Matching**:
+   - Captured and passed `_fbp` and `_fbc` parameters in both browser and server payloads to maximize match quality.
+3. **Normalized User Data**:
+   - SHA-256 hashed customer emails, names, cities, and formatted Pakistani phone numbers to E.164 (`923...`) before sending to Meta Graph API v19.0.
+4. **Stale Test Code Removal**:
+   - Removed automatic fallback to expired Firestore test codes in `lib/facebookCapi.ts`.
+   - Updated Firestore settings (`lib/firestore.ts`) with `deleteField()` so test codes can be cleanly removed.
+   - Added UI controls in `app/admin/settings/page.tsx` allowing admins to save or clear test codes with warnings.
+5. **Live Verification**:
+   - Dispatched live test events (`Purchase`, `InitiateCheckout`, `AddToCart`, `ViewContent`) with active test code `TEST90178`.
+   - Verified that Meta Graph API responded with `events_received: 1`, `messages: []`, and confirmed all events successfully appeared as **Server** in Meta Events Manager.
