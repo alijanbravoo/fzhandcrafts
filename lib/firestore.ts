@@ -11,7 +11,8 @@ import {
   where, 
   orderBy,
   runTransaction,
-  Timestamp 
+  Timestamp,
+  deleteField 
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { cleanPhoneNumber } from './utils';
@@ -369,14 +370,26 @@ export const updateSettings = async (settings: Partial<Settings>): Promise<void>
   const settingsRef = doc(db, 'settings', 'general');
   const settingsSnap = await getDoc(settingsRef);
 
-  const cleanedSettings = Object.fromEntries(
-    Object.entries(settings).filter(([, value]) => value !== undefined)
-  ) as Partial<Settings>;
+  const cleanedSettings: Record<string, any> = {};
+  for (const [key, value] of Object.entries(settings)) {
+    if (value === undefined || value === '') {
+      cleanedSettings[key] = deleteField();
+    } else {
+      cleanedSettings[key] = value;
+    }
+  }
 
   if (settingsSnap.exists()) {
     await updateDoc(settingsRef, cleanedSettings);
   } else {
-    await setDoc(settingsRef, cleanedSettings);
+    // When creating, filter out deleteField()
+    const initialSettings: Record<string, any> = {};
+    for (const [key, value] of Object.entries(settings)) {
+      if (value !== undefined && value !== '') {
+        initialSettings[key] = value;
+      }
+    }
+    await setDoc(settingsRef, initialSettings);
   }
 };
 

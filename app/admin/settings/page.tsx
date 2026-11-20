@@ -528,19 +528,30 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="metaTestEventCode" className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
-                    Meta Test Event Code (Optional - for live testing in Test Events tab)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label htmlFor="metaTestEventCode" className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Meta Test Event Code (Optional - for live testing only)
+                    </label>
+                    {formData.metaTestEventCode && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, metaTestEventCode: '' })}
+                        className="text-xs text-red-600 hover:underline font-semibold"
+                      >
+                        Clear Test Code
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     id="metaTestEventCode"
                     value={formData.metaTestEventCode}
                     onChange={(e) => setFormData({ ...formData, metaTestEventCode: e.target.value })}
-                    placeholder="e.g. TEST12345 (Found on the Test Events tab)"
+                    placeholder="Leave empty for live ad campaigns"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-mono"
                   />
-                  <p className="text-[11px] text-gray-500 mt-1">
-                    When testing in Events Manager, paste the code shown in the <em>Test Events</em> tab here. Clear it when done testing.
+                  <p className="text-[11px] text-amber-700 mt-1 font-medium">
+                    ⚠️ <strong>Important:</strong> Leave this field empty for live ad campaigns. Only enter a code when you have the Meta <em>Test Events</em> tab actively open with that specific code.
                   </p>
                 </div>
               </div>

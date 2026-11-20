@@ -82,13 +82,12 @@ export async function sendCapiEvent(payload: CapiEventPayload) {
   let testCode = payload.testEventCode || process.env.FACEBOOK_TEST_EVENT_CODE || TEST_EVENT_CODE;
 
   // Check Firestore settings if env vars are missing
-  if (!pixelId || !accessToken || !testCode) {
+  if (!pixelId || !accessToken) {
     try {
       const { getSettings } = await import('./firestore');
       const settings = await getSettings();
       if (!pixelId && settings.metaPixelId) pixelId = settings.metaPixelId;
       if (!accessToken && settings.metaCapiAccessToken) accessToken = settings.metaCapiAccessToken;
-      if (!testCode && settings.metaTestEventCode) testCode = settings.metaTestEventCode;
     } catch (e) {
       // Ignore if Firestore is not available
     }
