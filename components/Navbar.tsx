@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { FiShoppingCart, FiMenu, FiX, FiUser, FiPackage, FiLogOut, FiExternalLink, FiShield } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
+import { recordWhatsAppClick } from '@/lib/firestore';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -103,6 +104,7 @@ export default function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Chat on WhatsApp"
+                onClick={() => recordWhatsAppClick('navbar')}
                 className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all text-xs font-semibold"
               >
                 <FaWhatsapp className="w-3.5 h-3.5" />

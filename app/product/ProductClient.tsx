@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getProduct, getSettings, Product } from '@/lib/firestore';
+import { getProduct, getSettings, recordWhatsAppClick, Product } from '@/lib/firestore';
 import { formatCurrency, cleanWhatsAppNumber, normalizeImageUrl } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 import toast from 'react-hot-toast';
@@ -259,6 +259,8 @@ export default function ProductClient({ initialProduct }: ProductClientProps = {
 
   const handleWhatsAppOrder = () => {
     if (!product) return;
+
+    recordWhatsAppClick('product_page');
 
     trackHybridEvent({
       eventName: 'Contact',

@@ -4,29 +4,35 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
-import { getOrders } from '@/lib/firestore';
+import { getOrders, getWhatsAppClickCount } from '@/lib/firestore';
 import { Order } from '@/lib/firestore';
 import { formatCurrency } from '@/lib/utils';
 import AdminProtected from '@/components/AdminProtected';
 import toast from 'react-hot-toast';
-import { FiPackage, FiDollarSign, FiUsers, FiArrowRight, FiTruck } from 'react-icons/fi';
+import { FiPackage, FiDollarSign, FiUsers, FiArrowRight, FiTruck, FiMessageSquare } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [whatsappClicks, setWhatsappClicks] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadOrders();
+    loadDashboardData();
   }, []);
 
-  const loadOrders = async () => {
+  const loadDashboardData = async () => {
     try {
-      const allOrders = await getOrders();
+      const [allOrders, waData] = await Promise.all([
+        getOrders(),
+        getWhatsAppClickCount(),
+      ]);
       setOrders(allOrders);
+      setWhatsappClicks(waData.total);
     } catch (error) {
-      console.error('Error loading orders:', error);
+      console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -54,7 +60,7 @@ export default function AdminDashboard() {
 
           <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pt-20 sm:pt-20 lg:pt-8 w-full max-w-full min-w-0">
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 w-full min-w-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 w-full min-w-0">
               <div className="bg-white rounded-2xl shadow-xs border border-gray-200 p-5 sm:p-6 min-w-0">
                 <div className="flex items-center justify-between gap-3 min-w-0">
                   <div className="min-w-0 flex-1">
@@ -87,7 +93,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-xs border border-gray-200 p-5 sm:p-6 min-w-0 sm:col-span-2 md:col-span-1">
+              <div className="bg-white rounded-2xl shadow-xs border border-gray-200 p-5 sm:p-6 min-w-0">
                 <div className="flex items-center justify-between gap-3 min-w-0">
                   <div className="min-w-0 flex-1">
                     <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider truncate">
@@ -99,6 +105,23 @@ export default function AdminDashboard() {
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
                     <FiUsers className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+
+              {/* WhatsApp Button Clicks Counter */}
+              <div className="bg-white rounded-2xl shadow-xs border border-gray-200 p-5 sm:p-6 min-w-0">
+                <div className="flex items-center justify-between gap-3 min-w-0">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider truncate">
+                      WhatsApp Clicks
+                    </p>
+                    <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#25D366] mt-1 sm:mt-2 truncate">
+                      {whatsappClicks}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#25D366] flex items-center justify-center shrink-0">
+                    <FaWhatsapp className="w-6 h-6" />
                   </div>
                 </div>
               </div>

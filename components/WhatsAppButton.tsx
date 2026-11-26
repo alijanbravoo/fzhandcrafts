@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { FaWhatsapp } from 'react-icons/fa';
-import { getSettings } from '@/lib/firestore';
+import { getSettings, recordWhatsAppClick } from '@/lib/firestore';
 import { cleanWhatsAppNumber } from '@/lib/utils';
 
 interface WhatsAppButtonProps {
@@ -73,6 +73,7 @@ export default function WhatsAppButton({ customMessage, phoneNumber }: WhatsAppB
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with FZhandcrafts on WhatsApp"
+        onClick={() => recordWhatsAppClick('floating_button')}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         className="relative flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95"

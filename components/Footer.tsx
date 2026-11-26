@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FiFacebook, FiInstagram, FiTwitter, FiMail, FiPhone } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
-import { getSettings } from '@/lib/firestore';
+import { getSettings, recordWhatsAppClick } from '@/lib/firestore';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Footer() {
@@ -95,6 +95,7 @@ export default function Footer() {
                   href={`https://wa.me/${contactPhone.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => recordWhatsAppClick('footer')}
                   className="hover:text-[#ffdead] transition-colors inline-flex items-center gap-1.5 text-[#25D366]"
                 >
                   <FaWhatsapp className="w-3.5 h-3.5" />

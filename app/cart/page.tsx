@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency, cleanWhatsAppNumber } from '@/lib/utils';
-import { getSettings } from '@/lib/firestore';
+import { getSettings, recordWhatsAppClick } from '@/lib/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
@@ -34,6 +34,8 @@ export default function CartPage() {
 
   const handleWhatsAppCheckout = () => {
     if (cartItems.length === 0) return;
+
+    recordWhatsAppClick('cart_checkout');
 
     // Track Contact event via Meta Pixel & CAPI
     trackHybridEvent({

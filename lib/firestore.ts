@@ -12,7 +12,8 @@ import {
   orderBy,
   runTransaction,
   Timestamp,
-  deleteField 
+  deleteField,
+  increment
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { cleanPhoneNumber } from './utils';
@@ -514,6 +515,45 @@ export const addAdminAccount = async (email: string, addedBy: string): Promise<v
     createdAt: Timestamp.now(),
     isActive: true,
   });
+};
+
+// ==========================================
+// WhatsApp Analytics & Click Tracking
+// ==========================================
+
+export const recordWhatsAppClick = async (source = 'general'): Promise<void> => {
+  try {
+    const statsDocRef = doc(db, 'analytics', 'whatsapp');
+    await setDoc(
+      statsDocRef,
+      {
+        totalClicks: increment(1),
+        [`sources.${source}`]: increment(1),
+        lastClickedAt: Timestamp.now(),
+      },
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn('[recordWhatsAppClick] Failed to increment count:', err);
+  }
+};
+
+export const getWhatsAppClickCount = async (): Promise<{ total: number; sources?: Record<string, number> }> => {
+  try {
+    const statsDocRef = doc(db, 'analytics', 'whatsapp');
+    const snap = await getDoc(statsDocRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      return {
+        total: Number(data.totalClicks || 0),
+        sources: data.sources || {},
+      };
+    }
+    return { total: 0, sources: {} };
+  } catch (err) {
+    console.warn('[getWhatsAppClickCount] Error reading count:', err);
+    return { total: 0, sources: {} };
+  }
 };
 
 export const removeAdminAccount = async (email: string): Promise<void> => {
