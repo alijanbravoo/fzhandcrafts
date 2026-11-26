@@ -46,6 +46,7 @@ export interface Order {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  customerCity?: string;
   customerAddress: string;
   items: OrderItem[];
   total: number;
@@ -208,6 +209,9 @@ export const createOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'updat
     updatedAt: now,
   };
 
+  if (order.customerCity && order.customerCity.trim() !== '') {
+    cleanOrder.customerCity = order.customerCity.trim();
+  }
   if (order.specialRequest && order.specialRequest.trim() !== '') {
     cleanOrder.specialRequest = order.specialRequest.trim();
   }

@@ -33,12 +33,31 @@ export const generateOrderNumber = (): string => {
   return orderCounter.toString();
 };
 
-// Clean all non-digit characters from phone number
+// Clean and normalize phone number:
+// - Strips spaces, dashes, parentheses, dots, and non-digits
+// - Handles Pakistani international format (+92, 0092, 92) converting to 03XXXXXXXXX
+// - Handles 10-digit formats (3XXXXXXXXX) converting to 03XXXXXXXXX
 export const cleanPhoneNumber = (phone: string): string => {
-  return (phone || '').replace(/\D/g, '');
+  let cleaned = (phone || '').trim().replace(/\D/g, '');
+  if (!cleaned) return '';
+
+  // 00923001234567 -> 03001234567
+  if (cleaned.startsWith('0092')) {
+    cleaned = '0' + cleaned.slice(4);
+  }
+  // 923001234567 -> 03001234567
+  else if (cleaned.startsWith('92') && cleaned.length >= 11) {
+    cleaned = '0' + cleaned.slice(2);
+  }
+  // 3001234567 (10 digits starting with 3) -> 03001234567
+  else if (cleaned.startsWith('3') && cleaned.length === 10) {
+    cleaned = '0' + cleaned;
+  }
+
+  return cleaned;
 };
 
-// Validate Pakistani phone number (must be 11 digits and start with 03)
+// Validate Pakistani phone number (forgiving normalization: auto-strips spaces/dashes/+92 and validates 11 digits starting with 03)
 export const validatePakistaniPhone = (
   phone: string
 ): { isValid: boolean; cleaned: string; error?: string } => {
@@ -60,7 +79,7 @@ export const validatePakistaniPhone = (
     return {
       isValid: false,
       cleaned,
-      error: `Phone number must be exactly 11 digits (currently ${cleaned.length} digits)`,
+      error: `Phone number must be 11 digits (currently ${cleaned.length} digits)`,
     };
   }
   

@@ -47,12 +47,13 @@ export default function CheckoutPage() {
 
   const [formData, setFormData] = useState({
     customerName: '',
-    customerEmail: '',
     customerPhone: '',
+    customerCity: '',
     customerAddress: '',
     specialRequest: '',
-    preferredCallTime: '',
   });
+
+  const [showNotes, setShowNotes] = useState(false);
 
   // Post-order account creation prompt state for guest orders
   const [completedOrder, setCompletedOrder] = useState<{
@@ -111,7 +112,6 @@ export default function CheckoutPage() {
       setFormData((prev) => ({
         ...prev,
         customerName: prev.customerName || displayName || '',
-        customerEmail: prev.customerEmail || (!isPhoneUser && user.email ? user.email : ''),
         customerPhone: prev.customerPhone || (isPhoneUser ? phoneNumber : ''),
       }));
     } else if (typeof window !== 'undefined') {
@@ -173,7 +173,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Strict Pakistani Phone Validation
+    // Forgiving Pakistani Phone Validation (auto-strips spaces, dashes, +92)
     const phoneValidation = validatePakistaniPhone(formData.customerPhone);
     if (!phoneValidation.isValid) {
       setPhoneError(phoneValidation.error || 'Invalid phone number');
@@ -181,8 +181,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (formData.customerEmail.trim() && !formData.customerEmail.includes('@')) {
-      toast.error('Please enter a valid email address');
+    if (!formData.customerCity.trim()) {
+      toast.error('Please enter your city');
       return;
     }
 
@@ -213,14 +213,15 @@ export default function CheckoutPage() {
       }
 
       const cleanedPhone = phoneValidation.cleaned;
-      // If customer didn't provide email, use phone number as account identifier
-      const effectiveEmail = formData.customerEmail.trim() || phoneToEmail(cleanedPhone);
+      // Phone number as account identifier
+      const effectiveEmail = (user?.email && !isPhoneUser) ? user.email : phoneToEmail(cleanedPhone);
 
       const orderPayload: any = {
         orderNumber,
         customerName: formData.customerName.trim(),
         customerEmail: effectiveEmail,
         customerPhone: cleanedPhone,
+        customerCity: formData.customerCity.trim(),
         customerAddress: formData.customerAddress.trim(),
         items: orderItems,
         total: getTotal(),
@@ -230,9 +231,6 @@ export default function CheckoutPage() {
 
       if (formData.specialRequest && formData.specialRequest.trim() !== '') {
         orderPayload.specialRequest = formData.specialRequest.trim();
-      }
-      if (formData.preferredCallTime && formData.preferredCallTime.trim() !== '') {
-        orderPayload.preferredCallTime = formData.preferredCallTime.trim();
       }
       if (user?.uid) {
         orderPayload.userId = user.uid;
@@ -261,7 +259,7 @@ export default function CheckoutPage() {
           email: effectiveEmail,
           phone: cleanedPhone,
           firstName: formData.customerName.trim(),
-          city: formData.customerAddress.trim(),
+          city: formData.customerCity.trim(),
           externalId: user?.uid || cleanedPhone,
         },
         customData: {
@@ -628,14 +626,13 @@ export default function CheckoutPage() {
 
             <div>
               <label htmlFor="customerPhone" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
-                Phone Number (11 digits, starts with 03) *
+                Phone Number *
               </label>
               <input
                 type="tel"
                 id="customerPhone"
                 required
-                placeholder="03001234567"
-                maxLength={14}
+                placeholder="0300 1234567 or +92300..."
                 value={formData.customerPhone}
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm ${
@@ -646,101 +643,78 @@ export default function CheckoutPage() {
                 <p className="text-xs text-red-600 font-medium mt-1">{phoneError}</p>
               ) : (
                 <p className="text-[11px] text-gray-500 mt-1">
-                  11 digits starting with 03 (e.g. 03001234567). We call this number for confirmation.
+                  Enter any format (e.g. 03001234567 or +92 300 1234567). We call for confirmation.
                 </p>
               )}
             </div>
 
+            {/* Dedicated City Field */}
             <div>
-              <label htmlFor="customerEmail" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
-                Email Address (Optional)
+              <label htmlFor="customerCity" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
+                City *
               </label>
               <input
-                type="email"
-                id="customerEmail"
-                placeholder="your.email@example.com"
-                value={formData.customerEmail}
-                onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
+                type="text"
+                id="customerCity"
+                required
+                placeholder="e.g. Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad..."
+                value={formData.customerCity}
+                onChange={(e) => setFormData({ ...formData, customerCity: e.target.value })}
                 className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
               />
-              <p className="text-[11px] text-gray-500 mt-1">
-                If omitted, your phone number will be used to track your orders.
-              </p>
             </div>
 
             <div>
               <label htmlFor="customerAddress" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
-                Complete Delivery Address *
+                Delivery Address *
               </label>
               <textarea
                 id="customerAddress"
-                rows={3}
+                rows={2}
                 required
-                placeholder="House/Apartment #, Street, Sector/Area, City"
+                placeholder="House / Apartment #, Street, Block, Area..."
                 value={formData.customerAddress}
                 onChange={(e) => setFormData({ ...formData, customerAddress: e.target.value })}
                 className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
               />
             </div>
 
-            {/* Special Request */}
+            {/* Collapsed Special Request Note */}
             <div>
-              <label htmlFor="specialRequest" className="block text-xs uppercase tracking-wider font-bold text-gray-700 mb-1.5">
-                Special Request or Custom Notes (Optional)
-              </label>
-              <textarea
-                id="specialRequest"
-                rows={2}
-                placeholder="Add any customization details, gift greeting, or special event date..."
-                value={formData.specialRequest}
-                onChange={(e) => setFormData({ ...formData, specialRequest: e.target.value })}
-                className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
-              />
-            </div>
-
-            {/* Preferred Call Time */}
-            <div className="bg-[#f5f3f0] p-4 sm:p-5 rounded-2xl border border-[#eae8e5]">
-              <label className="block text-xs uppercase tracking-wider font-bold text-[#013428] mb-1">
-                Preferred Confirmation Call Window (Optional)
-              </label>
-              <p className="text-xs text-gray-500 mb-3">
-                Select your preferred window for our atelier team to call for order confirmation:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {[
-                  { value: 'Morning 8-12 AM', label: '🌅 Morning (8 AM - 12 PM)' },
-                  { value: 'Noon 12-3 PM', label: '☀️ Noon (12 PM - 3 PM)' },
-                  { value: 'Afternoon 3-6 PM', label: '🌤️ Afternoon (3 PM - 6 PM)' },
-                  { value: 'Night 6-10 PM', label: '🌙 Night (6 PM - 10 PM)' },
-                ].map((option) => (
-                  <label
-                    key={option.value}
-                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer text-xs font-semibold transition-all ${
-                      formData.preferredCallTime === option.value
-                        ? 'border-[#013428] bg-white text-[#013428] ring-2 ring-[#013428]'
-                        : 'border-[#eae8e5] bg-white/70 text-gray-700 hover:bg-white'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="preferredCallTime"
-                      value={option.value}
-                      checked={formData.preferredCallTime === option.value}
-                      onChange={(e) => setFormData({ ...formData, preferredCallTime: e.target.value })}
-                      className="text-[#013428] focus:ring-[#013428] w-4 h-4"
-                    />
-                    <span>{option.label}</span>
-                  </label>
-                ))}
-              </div>
-              {formData.preferredCallTime && (
+              {!showNotes && !formData.specialRequest ? (
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, preferredCallTime: '' })}
-                  className="text-[11px] text-[#6b1d30] hover:underline mt-2 block font-medium"
+                  onClick={() => setShowNotes(true)}
+                  className="text-xs font-semibold text-[#013428] hover:text-[#1e4b3e] hover:underline flex items-center gap-1.5 py-1"
                 >
-                  Clear call time preference
+                  <span>+ Add a note or special request (optional)</span>
                 </button>
+              ) : (
+                <div className="pt-1">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="specialRequest" className="block text-xs uppercase tracking-wider font-bold text-gray-700">
+                      Special Request or Custom Notes (Optional)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowNotes(false);
+                        setFormData({ ...formData, specialRequest: '' });
+                      }}
+                      className="text-[11px] text-gray-400 hover:text-gray-600"
+                    >
+                      Hide
+                    </button>
+                  </div>
+                  <textarea
+                    id="specialRequest"
+                    rows={2}
+                    placeholder="Add any customization details, gift greeting, or special event date..."
+                    value={formData.specialRequest}
+                    onChange={(e) => setFormData({ ...formData, specialRequest: e.target.value })}
+                    className="w-full px-4 py-3 border border-[#eae8e5] rounded-xl focus:ring-2 focus:ring-[#013428] focus:border-transparent bg-[#fbf9f6] text-gray-900 text-sm"
+                  />
+                </div>
               )}
             </div>
 
