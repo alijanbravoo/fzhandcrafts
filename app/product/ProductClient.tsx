@@ -13,15 +13,19 @@ import { FaWhatsapp, FaStar } from 'react-icons/fa';
 import ProductReviews from '@/components/ProductReviews';
 import { trackHybridEvent } from '@/lib/fpixel';
 
-export default function ProductClient() {
+interface ProductClientProps {
+  initialProduct?: Product | null;
+}
+
+export default function ProductClient({ initialProduct }: ProductClientProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
 
-  const productId = useMemo(() => searchParams.get('id'), [searchParams]);
+  const productId = useMemo(() => searchParams.get('id') || initialProduct?.id || null, [searchParams, initialProduct]);
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<Product | null>(initialProduct || null);
+  const [loading, setLoading] = useState(!initialProduct);
   const [quantity, setQuantity] = useState(1);
   const [whatsappNumber, setWhatsappNumber] = useState('923001234567');
   const hasTrackedView = useRef<string | null>(null);
@@ -47,16 +51,34 @@ export default function ProductClient() {
   };
 
   useEffect(() => {
+    // If initialProduct was already supplied via server-side props, immediately track ViewContent
+    if (initialProduct && hasTrackedView.current !== initialProduct.id) {
+      hasTrackedView.current = initialProduct.id || 'tracked';
+      trackHybridEvent({
+        eventName: 'ViewContent',
+        eventId: `view_${initialProduct.id}_${Date.now()}`,
+        customData: {
+          content_name: initialProduct.name,
+          content_ids: [initialProduct.id || ''],
+          content_type: 'product',
+          value: initialProduct.price,
+          currency: 'PKR',
+        },
+      });
+    }
+
     const loadProductAndSettings = async () => {
       if (!productId) {
-        toast.error('Product not found');
-        router.push('/products');
+        if (!initialProduct) {
+          toast.error('Product not found');
+          router.push('/products');
+        }
         return;
       }
 
       try {
         const [productData, settings] = await Promise.all([
-          getProduct(productId),
+          initialProduct ? Promise.resolve(initialProduct) : getProduct(productId),
           getSettings(),
         ]);
 
@@ -76,7 +98,7 @@ export default function ProductClient() {
               },
             });
           }
-        } else {
+        } else if (!initialProduct) {
           toast.error('Product not found');
           router.push('/products');
         }
@@ -88,14 +110,16 @@ export default function ProductClient() {
         }
       } catch (error) {
         console.error('Error loading product:', error);
-        toast.error('Error loading product');
+        if (!initialProduct) {
+          toast.error('Error loading product');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadProductAndSettings();
-  }, [productId, router]);
+  }, [productId, initialProduct, router]);
 
   // Image list
   const images = useMemo(() => {
@@ -197,8 +221,40 @@ export default function ProductClient() {
   };
 
   const handleOrderNow = () => {
-    handleAddToCart(false);
-    router.push('/checkout');
+    if (product) {
+      const bundleLabel = selectedBundleTier === 1 ? '' : ` (${selectedBundleTier} Pairs Bundle)`;
+      // Add product to local cart state for checkout fulfillment without firing AddToCart pixel
+      addToCart({
+        productId: product.id!,
+        name: `${product.name}${bundleLabel}`,
+        price: activeBundlePrice,
+        quantity,
+        image: images[0] || '',
+      });
+
+      // Buy Now: Fire InitiateCheckout only (NOT AddToCart + InitiateCheckout)
+      trackHybridEvent({
+        eventName: 'InitiateCheckout',
+        eventId: `initiate_checkout_${product.id}_${Date.now()}`,
+        customData: {
+          content_name: product.name,
+          content_ids: [product.id || ''],
+          content_type: 'product',
+          value: currentTotalPrice,
+          currency: 'PKR',
+          num_items: 1,
+          contents: [
+            {
+              id: product.id || '',
+              quantity,
+              item_price: activeBundlePrice,
+            },
+          ],
+        },
+      });
+
+      router.push('/checkout');
+    }
   };
 
   const handleWhatsAppOrder = () => {
